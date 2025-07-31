@@ -80,6 +80,10 @@ var score_multiplier: int = 1
 var fever_meter: float = 0.0
 var current_sword_state_index: int = 0
 
+# Miss penalty system
+var consecutive_misses: int = 0
+var base_miss_penalty: int = 500
+
 const SCORE_VALUES = {
 	"Perfect": 1000,
 	"Good": 250,
@@ -103,6 +107,7 @@ func reset_game_state():
 	total_score = 0
 	score_multiplier = 1
 	set_fever_meter(FEVER_METER_MIN)
+	consecutive_misses = 0
 
 	song_position = 0.0
 	next_note_index = 0
@@ -145,15 +150,33 @@ func set_fever_meter(value: float):
 	if is_instance_valid(fever_meter_bar):
 		fever_meter_bar.value = fever_meter
 
+# Calculate the miss penalty based on consecutive misses
+func calculate_miss_penalty() -> int:
+	if consecutive_misses == 0:
+		return base_miss_penalty
+	# Each miss doubles the penalty: -500, -1000, -2000, -4000, etc.
+	return base_miss_penalty * (2 ** (consecutive_misses - 1))
+
 # Core function for score logic, now based on the Fever Meter.
 func _on_note_judged(judgment: String):
 	match judgment:
 		"Perfect":
 			set_fever_meter(fever_meter + fever_gain_perfect)
+			# Reset consecutive misses when hitting a note
+			consecutive_misses = 0
 		"Good", "OK":
 			set_fever_meter(fever_meter - fever_penalty_imperfect)
+			# Reset consecutive misses when hitting a note
+			consecutive_misses = 0
 		"Miss":
 			set_fever_meter(FEVER_METER_MIN)
+			# Increment consecutive misses and apply penalty
+			consecutive_misses += 1
+			var miss_penalty = calculate_miss_penalty()
+			total_score -= miss_penalty
+			# Ensure score doesn't go below 0
+			if total_score < 0:
+				total_score = 0
 
 	_update_multiplier()
 
@@ -170,7 +193,13 @@ func _on_note_judged(judgment: String):
 		score_multiplier = 1
 
 	_update_ui()
-	print("Judgment: %s | Fever: %.1f | Multiplier: x%d | Score: %d" % [judgment, fever_meter, score_multiplier, total_score])
+
+	# Enhanced debug output to show miss penalty information
+	if judgment == "Miss":
+		var miss_penalty = calculate_miss_penalty()
+		print("Judgment: %s | Miss Penalty: -%d | Consecutive Misses: %d | Fever: %.1f | Multiplier: x%d | Score: %d" % [judgment, miss_penalty, consecutive_misses, fever_meter, score_multiplier, total_score])
+	else:
+		print("Judgment: %s | Fever: %.1f | Multiplier: x%d | Score: %d" % [judgment, fever_meter, score_multiplier, total_score])
 
 # Checks if the current score has unlocked a new visual state for the sword.
 # This progression is permanent for the duration of the run (non-regression).
