@@ -1,38 +1,44 @@
-[gd_scene load_steps=3 format=3 uid="uid://b3pm2nt526yr7"]
+[gd_scene load_steps=7 format=3 uid="uid://b3pm2nt526yr7"]
 
 [ext_resource type="Script" uid="uid://bh6srqu5h8vbj" path="res://scripts/game.gd" id="1_uwrxv"]
+[ext_resource type="Texture2D" uid="uid://pdscnrc6xxkt" path="res://assets/sprites/swords/sword_level_0.webp" id="2_iywne"]
+[ext_resource type="Texture2D" uid="uid://cjw0i32mrl7kj" path="res://assets/sprites/swords/sword_level_1.webp" id="3_p57ef"]
+[ext_resource type="Texture2D" uid="uid://cgsvm8ifylrqq" path="res://assets/sprites/swords/sword_level_2.webp" id="4_u5sy4"]
+[ext_resource type="Texture2D" uid="uid://coqrcxpsgupww" path="res://assets/sprites/swords/sword_level_3.webp" id="5_gee14"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_04n7w"]
 font_size = 32
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_uwrxv")
+sword_state_textures = Array[Texture2D]([ExtResource("2_iywne"), ExtResource("3_p57ef"), ExtResource("4_u5sy4"), ExtResource("5_gee14")])
+
+[node name="SwordDisplay" type="Sprite2D" parent="."]
+position = Vector2(150, 256)
 
 [node name="Track" type="ColorRect" parent="."]
 anchors_preset = -1
 offset_left = 232.0
-offset_top = 232.0
+offset_top = 443.0
 offset_right = 880.0
-offset_bottom = 382.0
+offset_bottom = 537.0
 color = Color(0.207512, 0.207512, 0.207512, 1)
 
 [node name="SpawnPoint" type="Marker2D" parent="."]
-position = Vector2(232, 307)
+position = Vector2(232, 490)
 
 [node name="TargetZone" type="Marker2D" parent="."]
-position = Vector2(880, 307)
+position = Vector2(880, 490)
 
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="ScoreLabel" type="Label" parent="UI"]
 anchors_preset = -1
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -20.0
-offset_right = 20.0
-offset_bottom = 46.0
-grow_horizontal = 2
-text = "Score: 0"
+offset_left = 94.0
+offset_top = 85.0
+offset_right = 215.0
+offset_bottom = 131.0
+text = "0"
 label_settings = SubResource("LabelSettings_04n7w")
 horizontal_alignment = 1
 
@@ -49,14 +55,11 @@ horizontal_alignment = 2
 
 [node name="FeverMeterBar" type="ProgressBar" parent="UI"]
 anchors_preset = -1
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -200.0
-offset_top = -60.0
-offset_right = 200.0
-offset_bottom = -33.0
-grow_horizontal = 2
-grow_vertical = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -445.0
+offset_top = 45.0
+offset_right = -45.0
+offset_bottom = 72.0
+grow_horizontal = 0
 show_percentage = false

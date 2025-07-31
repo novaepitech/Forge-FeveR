@@ -19,6 +19,21 @@ const NoteScene = preload("res://scenes/note.tscn")
 const FEVER_METER_MIN: float = 0.0
 const FEVER_METER_MAX: float = 100.0
 
+@export_group("Sword Progression")
+# The score thresholds required to reach the next visual state of the sword.
+# Example: [10000, 25000, 50000] means:
+# - State 1 ("Lame brute") is reached at 10,000 points.
+# - State 2 ("Lame affûtée") is reached at 25,000 points.
+# - State 3 ("Lame spectaculaire") is reached at 50,000 points.
+@export var sword_score_thresholds: Array[int] = [10000, 25000, 50000]
+# The textures for the sword's visual states.
+# Must have one more element than the thresholds array.
+# - Index 0: "Lingot" (initial state)
+# - Index 1: "Lame brute"
+# - etc.
+@export var sword_state_textures: Array[Texture2D]
+
+
 # --- Chart Data ---
 @export var chart_data: Array[float] = [
 	# Section 1: Introduction (slow and regular rhythm)
@@ -63,6 +78,7 @@ var total_score: int = 0
 var score_multiplier: int = 1
 
 var fever_meter: float = 0.0
+var current_sword_state_index: int = 0
 
 const SCORE_VALUES = {
 	"Perfect": 1000,
@@ -77,6 +93,7 @@ const SCORE_VALUES = {
 @onready var score_label: Label = $UI/ScoreLabel
 @onready var multiplier_label: Label = $UI/MultiplierLabel
 @onready var fever_meter_bar: ProgressBar = $UI/FeverMeterBar
+@onready var sword_display: Sprite2D = $SwordDisplay
 
 func _ready():
 	note_judged.connect(_on_note_judged)
@@ -89,6 +106,17 @@ func reset_game_state():
 
 	song_position = 0.0
 	next_note_index = 0
+
+	# Reset sword to its initial state ("Lingot")
+	current_sword_state_index = 0
+	if is_instance_valid(sword_display):
+		sword_display.visible = true
+		if not sword_state_textures.is_empty() and sword_state_textures[0]:
+			sword_display.texture = sword_state_textures[0]
+		else:
+			# Hide the sprite if no textures are configured to avoid showing a white box
+			sword_display.visible = false
+			print("Warning: Sword textures are not configured. Hiding SwordDisplay.")
 
 	_update_ui()
 
@@ -133,6 +161,8 @@ func _on_note_judged(judgment: String):
 	if base_score > 0:
 		var points_gained = base_score * score_multiplier
 		total_score += points_gained
+		# Check if the score update triggered a sword evolution
+		_update_sword_visual()
 
 	# On "Miss", we must also reset the multiplier to 1 immediately.
 	# The GDD says it's instant, so let's ensure that.
@@ -141,6 +171,33 @@ func _on_note_judged(judgment: String):
 
 	_update_ui()
 	print("Judgment: %s | Fever: %.1f | Multiplier: x%d | Score: %d" % [judgment, fever_meter, score_multiplier, total_score])
+
+# Checks if the current score has unlocked a new visual state for the sword.
+# This progression is permanent for the duration of the run (non-regression).
+func _update_sword_visual():
+	# Determine the highest state we currently qualify for based on score
+	var target_state_index = 0
+	for i in range(sword_score_thresholds.size()):
+		if total_score >= sword_score_thresholds[i]:
+			# The threshold array index `i` corresponds to the visual state `i + 1`.
+			# State 0 is the default.
+			target_state_index = i + 1
+		else:
+			# Since thresholds are sorted, we can stop early.
+			break
+
+	# Non-regression: Only update if we've reached a NEW, higher state.
+	if target_state_index > current_sword_state_index:
+		current_sword_state_index = target_state_index
+
+		# Update the visual if possible
+		if is_instance_valid(sword_display) and sword_state_textures.size() > current_sword_state_index:
+			var new_texture = sword_state_textures[current_sword_state_index]
+			if new_texture:
+				sword_display.texture = new_texture
+			else:
+				print("Warning: Texture for sword state index %d is not set." % current_sword_state_index)
+
 
 # Function dedicated to updating the multiplier.
 func _update_multiplier():
@@ -159,7 +216,7 @@ func _update_multiplier():
 
 # Function dedicated to updating the UI.
 func _update_ui():
-	score_label.text = "Score: %d" % total_score
+	score_label.text = "%d" % total_score
 	multiplier_label.text = "x%d" % score_multiplier
 
 # --- Judgment Logic (unchanged) ---
