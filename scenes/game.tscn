@@ -36,22 +36,6 @@ text = "Score: 0"
 label_settings = SubResource("LabelSettings_04n7w")
 horizontal_alignment = 1
 
-[node name="ComboLabel" type="Label" parent="UI"]
-anchors_preset = -1
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -20.0
-offset_top = -146.0
-offset_right = 20.0
-offset_bottom = -100.0
-grow_horizontal = 2
-grow_vertical = 0
-text = "COMBO!"
-label_settings = SubResource("LabelSettings_04n7w")
-horizontal_alignment = 1
-
 [node name="MultiplierLabel" type="Label" parent="UI"]
 anchors_preset = -1
 anchor_left = 1.0
@@ -62,3 +46,17 @@ grow_horizontal = 0
 text = "x1"
 label_settings = SubResource("LabelSettings_04n7w")
 horizontal_alignment = 2
+
+[node name="FeverMeterBar" type="ProgressBar" parent="UI"]
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -60.0
+offset_right = 200.0
+offset_bottom = -33.0
+grow_horizontal = 2
+grow_vertical = 0
+show_percentage = false
