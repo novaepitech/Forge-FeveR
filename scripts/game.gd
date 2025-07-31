@@ -65,9 +65,9 @@ var score_multiplier: int = 1
 var fever_meter: float = 0.0
 
 const SCORE_VALUES = {
-	"Perfect": 100,
-	"Good": 50,
-	"OK": 10,
+	"Perfect": 1000,
+	"Good": 250,
+	"OK": 50,
 	"Miss": 0
 }
 
@@ -126,7 +126,6 @@ func _on_note_judged(judgment: String):
 			set_fever_meter(fever_meter - fever_penalty_imperfect)
 		"Miss":
 			set_fever_meter(FEVER_METER_MIN)
-			score_multiplier = 1
 
 	_update_multiplier()
 
@@ -135,17 +134,25 @@ func _on_note_judged(judgment: String):
 		var points_gained = base_score * score_multiplier
 		total_score += points_gained
 
+	# On "Miss", we must also reset the multiplier to 1 immediately.
+	# The GDD says it's instant, so let's ensure that.
+	if judgment == "Miss":
+		score_multiplier = 1
+
 	_update_ui()
 	print("Judgment: %s | Fever: %.1f | Multiplier: x%d | Score: %d" % [judgment, fever_meter, score_multiplier, total_score])
 
 # Function dedicated to updating the multiplier.
 func _update_multiplier():
-	# For now, here's a simple dependency to validate the requirements.
-	if fever_meter >= 75.0:
+	if fever_meter >= 95.0:
+		score_multiplier = 32 # Supernova Forge
+	elif fever_meter >= 80.0:
+		score_multiplier = 16
+	elif fever_meter >= 60.0:
+		score_multiplier = 8
+	elif fever_meter >= 40.0:
 		score_multiplier = 4
-	elif fever_meter >= 50.0:
-		score_multiplier = 3
-	elif fever_meter >= 25.0:
+	elif fever_meter >= 20.0:
 		score_multiplier = 2
 	else:
 		score_multiplier = 1
