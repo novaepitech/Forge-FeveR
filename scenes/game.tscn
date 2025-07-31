@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://b3pm2nt526yr7"]
+
+[ext_resource type="Script" uid="uid://bh6srqu5h8vbj" path="res://scripts/game.gd" id="1_uwrxv"]
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_uwrxv")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = -1
+offset_left = 232.0
+offset_top = 232.0
+offset_right = 880.0
+offset_bottom = 382.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+color = Color(0.20751238, 0.20751238, 0.20751238, 1)
+
+[node name="SpawnPoint" type="Marker2D" parent="."]
+position = Vector2(232, 237)
+
+[node name="TargetZone" type="Marker2D" parent="."]
+position = Vector2(232, 357)

@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://cfukxer3e8fvh"]
+
+[ext_resource type="Script" uid="uid://c7udk4dp2wo04" path="res://scripts/note.gd" id="1_doocs"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wn01w"]
+size = Vector2(120, 30)
+
+[node name="Note" type="Area2D"]
+script = ExtResource("1_doocs")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = -1
+offset_left = -60.0
+offset_top = 15.0
+offset_right = 60.0
+offset_bottom = 45.0
+color = Color(0.050980397, 1, 1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 30)
+shape = SubResource("RectangleShape2D_wn01w")
