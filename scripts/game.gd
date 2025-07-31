@@ -4,7 +4,7 @@ extends Node2D
 # --- Paramètres du jeu ---
 
 # Pré-chargez la scène de la note. C'est plus efficace que de la charger à chaque fois.
-const NoteScene = preload("res://note.tscn")
+const NoteScene = preload("res://scenes/note.tscn")
 
 # (Problème 1.3) Durée en secondes que met une note pour aller du SpawnPoint à la TargetZone.
 @export var lookahead_time: float = 2.0
