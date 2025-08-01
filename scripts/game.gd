@@ -5,8 +5,11 @@ signal note_judged(judgment: String)
 # --- Game Parameters ---
 const NoteScene = preload("res://scenes/note.tscn")
 @export var lookahead_time: float = 2.0
-
 @export var track_y_positions: Array[float] = [460.0, 490.0, 520.0]
+
+# --- Audio Parameters (NOUVEAU) ---
+const VOLUME_AUDIBLE_DB: float = 0.0
+const VOLUME_MUTED_DB: float = -80.0
 
 # --- Loop & Chart Parameters ---
 const LOOP_DURATION: float = 20.0
@@ -20,7 +23,7 @@ const EVALUATION_TIME: float = 17.0
 @export_group("Fever Meter Settings")
 @export var fever_gain_perfect: float = 10.0
 @export var fever_penalty_imperfect: float = 5.0
-@export var fever_decay_rate: float = 2.5 # Units per second
+@export var fever_decay_rate: float = 2.5
 
 const FEVER_METER_MIN: float = 0.0
 const FEVER_METER_MAX: float = 100.0
@@ -32,81 +35,59 @@ const FEVER_METER_MAX: float = 100.0
 @export_group("Checkpoints")
 @export var score_checkpoints: Array[int] = [100000, 600000, 800000]
 
-# --- Chart Data Structure (UPDATED) ---
-# Chaque note est un dictionnaire avec "time" et "track".
+# --- Chart Data Structure ---
 var all_charts: Dictionary = {
-	1: [
-		{"time": 2.0, "track": 1}, {"time": 3.5, "track": 2}, {"time": 5.0, "track": 3},
-		{"time": 6.5, "track": 1}, {"time": 8.0, "track": 2}, {"time": 9.5, "track": 3},
-		{"time": 11.0, "track": 1}, {"time": 12.5, "track": 2}, {"time": 14.0, "track": 3},
-		{"time": 15.5, "track": 2}
-	],
-	2: [
-		{"time": 1.0, "track": 1}, {"time": 2.0, "track": 2}, {"time": 3.0, "track": 3},
-		{"time": 4.0, "track": 1}, {"time": 4.5, "track": 2}, {"time": 5.0, "track": 1},
-		{"time": 6.0, "track": 3}, {"time": 7.0, "track": 2}, {"time": 8.0, "track": 1},
-		{"time": 8.5, "track": 2}, {"time": 9.0, "track": 3}, {"time": 10.0, "track": 2},
-		{"time": 11.0, "track": 1}, {"time": 12.0, "track": 3}, {"time": 12.5, "track": 2},
-		{"time": 13.0, "track": 1}, {"time": 14.0, "track": 2}, {"time": 15.0, "track": 3},
-		{"time": 16.0, "track": 1}, {"time": 16.5, "track": 2}
-	],
-	3: [
-		{"time": 1.0, "track": 1}, {"time": 1.5, "track": 1}, {"time": 2.0, "track": 2},
-		{"time": 2.75, "track": 3}, {"time": 3.5, "track": 2}, {"time": 4.25, "track": 1},
-		{"time": 5.0, "track": 3}, {"time": 5.5, "track": 2}, {"time": 6.0, "track": 1},
-		{"time": 6.5, "track": 3}, {"time": 7.0, "track": 3}, {"time": 8.0, "track": 1},
-		{"time": 8.25, "track": 2}, {"time": 8.5, "track": 3}, {"time": 8.75, "track": 1},
-		{"time": 9.0, "track": 2}, {"time": 10.0, "track": 3}, {"time": 10.5, "track": 1},
-		{"time": 11.0, "track": 2}, {"time": 11.75, "track": 1}, {"time": 12.5, "track": 2},
-		{"time": 13.25, "track": 3}, {"time": 14.0, "track": 1}, {"time": 14.5, "track": 2},
-		{"time": 15.0, "track": 3}, {"time": 15.5, "track": 2}, {"time": 16.0, "track": 1}
-	]
+	1: [{"time": 2.0, "track": 1}, {"time": 3.5, "track": 2}, {"time": 5.0, "track": 3}, {"time": 6.5, "track": 1}, {"time": 8.0, "track": 2}, {"time": 9.5, "track": 3}, {"time": 11.0, "track": 1}, {"time": 12.5, "track": 2}, {"time": 14.0, "track": 3}, {"time": 15.5, "track": 2}],
+	2: [{"time": 1.0, "track": 1}, {"time": 2.0, "track": 2}, {"time": 3.0, "track": 3}, {"time": 4.0, "track": 1}, {"time": 4.5, "track": 2}, {"time": 5.0, "track": 1}, {"time": 6.0, "track": 3}, {"time": 7.0, "track": 2}, {"time": 8.0, "track": 1}, {"time": 8.5, "track": 2}, {"time": 9.0, "track": 3}, {"time": 10.0, "track": 2}, {"time": 11.0, "track": 1}, {"time": 12.0, "track": 3}, {"time": 12.5, "track": 2}, {"time": 13.0, "track": 1}, {"time": 14.0, "track": 2}, {"time": 15.0, "track": 3}, {"time": 16.0, "track": 1}, {"time": 16.5, "track": 2}],
+	3: [{"time": 1.0, "track": 1}, {"time": 1.5, "track": 1}, {"time": 2.0, "track": 2}, {"time": 2.75, "track": 3}, {"time": 3.5, "track": 2}, {"time": 4.25, "track": 1}, {"time": 5.0, "track": 3}, {"time": 5.5, "track": 2}, {"time": 6.0, "track": 1}, {"time": 6.5, "track": 3}, {"time": 7.0, "track": 3}, {"time": 8.0, "track": 1}, {"time": 8.25, "track": 2}, {"time": 8.5, "track": 3}, {"time": 8.75, "track": 1}, {"time": 9.0, "track": 2}, {"time": 10.0, "track": 3}, {"time": 10.5, "track": 1}, {"time": 11.0, "track": 2}, {"time": 11.75, "track": 1}, {"time": 12.5, "track": 2}, {"time": 13.25, "track": 3}, {"time": 14.0, "track": 1}, {"time": 14.5, "track": 2}, {"time": 15.0, "track": 3}, {"time": 15.5, "track": 2}, {"time": 16.0, "track": 1}]
 }
 
 var MAX_LEVEL: int
-
-# --- Game State ---
 var song_position: float = 0.0
 var active_notes: Array[Node] = []
-
 var total_score: int = 0
 var score_multiplier: int = 1
-
 var fever_meter: float = 0.0
 var current_sword_state_index: int = 0
 var highest_checkpoint_reached: int = 0
-
 var consecutive_misses: int = 0
 var base_miss_penalty: int = 500
-
 const SCORE_VALUES = { "Perfect": 1000, "Good": 250, "OK": 50, "Miss": 0 }
-
-# --- Loop-specific State ---
 var loop_position: float = 0.0
 var last_loop_position: float = 0.0
 var current_loop_start_time: float = 0.0
-
 var current_level: int = 1
 var next_level: int = 1
-
 var notes_in_current_loop: int = 0
 var notes_hit_in_current_loop: int = 0
-
 var current_level_spawn_idx: int = 0
 var next_level_spawn_idx: int = 0
 
 # --- Node References ---
-@onready var spawn_pos_marker: Marker2D = $SpawnPoint # Renamed for clarity
-@onready var target_pos_marker: Marker2D = $TargetZone # Renamed for clarity
+@onready var spawn_pos_marker: Marker2D = $SpawnPoint
+@onready var target_pos_marker: Marker2D = $TargetZone
 @onready var score_label: Label = $UI/ScoreLabel
 @onready var multiplier_label: Label = $UI/MultiplierLabel
 @onready var fever_meter_bar: ProgressBar = $UI/FeverMeterBar
 @onready var sword_display: Sprite2D = $SwordDisplay
 
+# --- Audio Node References (NOUVEAU) ---
+@onready var music_layers: Dictionary = {
+	1: $MusicLayers/MusicLayer1,
+	2: $MusicLayers/MusicLayer2,
+	3: $MusicLayers/MusicLayer3
+}
+@onready var sfx_perfect: AudioStreamPlayer = $SFX/SfxPerfect
+@onready var sfx_imperfect: AudioStreamPlayer = $SFX/SfxImperfect
+@onready var sfx_miss: AudioStreamPlayer = $SFX/SfxMiss
+@onready var sfx_level_up: AudioStreamPlayer = $SFX/SfxLevelUp
+@onready var sfx_level_down: AudioStreamPlayer = $SFX/SfxLevelDown
+
 func _ready():
 	MAX_LEVEL = all_charts.size()
 	note_judged.connect(_on_note_judged)
 	reset_game_state()
+	_initialize_audio() # (NOUVEAU) Lancement de la musique
 
 func reset_game_state():
 	total_score = 0
@@ -139,6 +120,32 @@ func reset_game_state():
 			sword_display.visible = false
 	_update_ui()
 
+	# (NOUVEAU) S'assurer que la musique est correcte au reset
+	if is_node_ready():
+		_update_music_volume()
+
+
+# --- Audio Management Functions (NOUVEAU) ---
+func _initialize_audio():
+	# Lance la lecture de toutes les couches musicales simultanément, mais en mode silencieux.
+	for level in music_layers:
+		var player = music_layers[level]
+		player.volume_db = VOLUME_MUTED_DB
+		player.play()
+	# Rend la première couche audible.
+	_update_music_volume()
+
+func _update_music_volume():
+	# Met à jour le volume de chaque couche en fonction du niveau actuel du joueur.
+	# Les couches sont additives : au niveau 3, les couches 1, 2 et 3 sont audibles.
+	for level in music_layers:
+		var player = music_layers[level]
+		if level <= current_level:
+			player.volume_db = VOLUME_AUDIBLE_DB
+		else:
+			player.volume_db = VOLUME_MUTED_DB
+
+# --- Main Game Loop ---
 func _process(delta):
 	song_position += delta
 	loop_position = fmod(song_position, LOOP_DURATION)
@@ -159,7 +166,14 @@ func _process(delta):
 func _on_loop_tick():
 	print("--- LOOP TICK --- New Level: %d" % next_level)
 	current_loop_start_time += LOOP_DURATION
+
+	var old_level = current_level
 	current_level = next_level
+
+	# (MODIFIÉ) Met à jour la musique si le niveau a changé
+	if old_level != current_level:
+		_update_music_volume()
+
 	current_level_spawn_idx = 0
 	_prepare_for_new_loop()
 
@@ -170,7 +184,9 @@ func _evaluate_performance():
 	else:
 		success_rate = 1.0
 
+	# (MODIFIÉ) Sauvegarde de l'ancien niveau pour la détection de changement
 	var old_next_level = next_level
+
 	if success_rate >= 1.0:
 		next_level = min(current_level + 1, MAX_LEVEL)
 		print("EVAL: LEVEL UP! (100%)")
@@ -181,6 +197,12 @@ func _evaluate_performance():
 		next_level = max(current_level - 1, 1)
 		print("EVAL: LEVEL DOWN! (%.0f%%)" % (success_rate * 100))
 
+	# (NOUVEAU) Déclenchement du SFX de transition de niveau
+	if next_level > current_level:
+		sfx_level_up.play()
+	elif next_level < current_level:
+		sfx_level_down.play()
+
 	if next_level != old_next_level:
 		next_level_spawn_idx = 0
 
@@ -189,34 +211,27 @@ func _prepare_for_new_loop():
 	notes_in_current_loop = chart.size()
 	notes_hit_in_current_loop = 0
 
-# --- Spawner Logic (UPDATED) ---
-
 func _spawn_notes_from_active_charts():
-	# Spawner for CURRENT level
 	var current_chart = all_charts.get(current_level, [])
 	while current_level_spawn_idx < current_chart.size():
 		var note_data = current_chart[current_level_spawn_idx]
 		var note_time_absolute = note_data.time + current_loop_start_time
 		if song_position >= note_time_absolute - lookahead_time:
-			spawn_note(note_time_absolute, note_data.track) # Pass track ID
+			spawn_note(note_time_absolute, note_data.track)
 			current_level_spawn_idx += 1
 		else:
 			break
 
-	# Spawner for NEXT level (anticipation)
 	var next_chart = all_charts.get(next_level, [])
 	while next_level_spawn_idx < next_chart.size():
 		var note_data = next_chart[next_level_spawn_idx]
 		var note_time_absolute = note_data.time + (current_loop_start_time + LOOP_DURATION)
 		if song_position >= note_time_absolute - lookahead_time:
-			spawn_note(note_time_absolute, note_data.track) # Pass track ID
+			spawn_note(note_time_absolute, note_data.track)
 			next_level_spawn_idx += 1
 		else:
 			break
 
-# --- Core Gameplay Logic (UPDATED) ---
-
-# UPDATED: Handles 3 distinct inputs
 func _unhandled_input(_event: InputEvent):
 	var hit_time = song_position
 	if Input.is_action_just_pressed("hit_track1"):
@@ -226,85 +241,73 @@ func _unhandled_input(_event: InputEvent):
 	elif Input.is_action_just_pressed("hit_track3"):
 		process_player_hit(hit_time, 3)
 
-# UPDATED: spawn_note now takes a track_id to position the note vertically.
 func spawn_note(target_time: float, track_id: int):
 	var note_instance = NoteScene.instantiate()
 	add_child(note_instance)
-
-	# Calculate position based on track
-	var y_pos = track_y_positions[track_id - 1] # track_id is 1-based, array is 0-based
+	var y_pos = track_y_positions[track_id - 1]
 	var spawn_for_track = Vector2(spawn_pos_marker.global_position.x, y_pos)
 	var target_for_track = Vector2(target_pos_marker.global_position.x, y_pos)
-
 	note_instance.setup(target_time, self, spawn_for_track, target_for_track, track_id)
 	active_notes.append(note_instance)
 	note_instance.missed.connect(_on_note_missed.bind(note_instance))
 
-# UPDATED: Entirely new logic for track-specific hit detection.
 func process_player_hit(hit_time: float, track_id: int):
 	var best_note_on_track: Node = null
-	var min_diff = timing_window_ok + 0.1 # A value larger than any possible valid hit
-
-	# 1. Find the closest note *on the correct track*
+	var min_diff = timing_window_ok + 0.1
 	for note in active_notes:
 		if note.track_id == track_id:
 			var diff = abs(note.target_time - hit_time)
 			if diff < min_diff:
 				min_diff = diff
 				best_note_on_track = note
-
-	# 2. If no note was found on this track, or it's too far, do nothing.
 	if best_note_on_track == null or min_diff > timing_window_ok:
 		return
-
-	# 3. Judge the found note
 	var timing_error = best_note_on_track.target_time - hit_time
 	var judgment: String
 	var abs_error = abs(timing_error)
 	if abs_error <= timing_window_perfect: judgment = "Perfect"
 	elif abs_error <= timing_window_good: judgment = "Good"
 	else: judgment = "OK"
-
 	emit_signal("note_judged", judgment)
 	active_notes.erase(best_note_on_track)
 	best_note_on_track.hit()
-
 
 func _on_note_missed(note_missed: Node):
 	emit_signal("note_judged", "Miss")
 	if active_notes.has(note_missed):
 		active_notes.erase(note_missed)
 
+# (MODIFIÉ) Ajout des déclenchements de SFX pour les jugements
 func _on_note_judged(judgment: String):
 	match judgment:
 		"Perfect":
 			notes_hit_in_current_loop += 1
 			set_fever_meter(fever_meter + fever_gain_perfect)
 			consecutive_misses = 0
+			sfx_perfect.play()
 		"Good", "OK":
 			notes_hit_in_current_loop += 1
 			set_fever_meter(fever_meter - fever_penalty_imperfect)
 			consecutive_misses = 0
+			sfx_imperfect.play()
 		"Miss":
 			set_fever_meter(FEVER_METER_MIN)
 			consecutive_misses += 1
+			sfx_miss.play()
 
 	_update_multiplier()
 	if judgment == "Miss": score_multiplier = 1
-
 	var score_change = 0
 	if judgment == "Miss":
 		score_change = -calculate_miss_penalty()
 	else:
 		score_change = SCORE_VALUES.get(judgment, 0) * score_multiplier
 	total_score += score_change
-
 	if score_change > 0:
 		for checkpoint_score in score_checkpoints:
 			if total_score >= checkpoint_score and checkpoint_score > highest_checkpoint_reached:
 				highest_checkpoint_reached = checkpoint_score
 	total_score = max(total_score, highest_checkpoint_reached)
-
 	_update_sword_visual()
 	_update_ui()
 
