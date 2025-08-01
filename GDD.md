@@ -2,7 +2,7 @@
 
 - **Jeu :** Forge FeveR
 - **Thème de la Jam :** Loop
-- **Version :** 1.1 (Dynamic Level System)
+- **Version :** 1.2
 
 ### **1. Vision & Concept (High Concept)**
 
@@ -34,7 +34,7 @@
 
 #### **2.2. Core Loop (dans chaque boucle de 20s)**
 
-1.  **VOIR :** Des notes (icônes d'enclume, seau, soufflet) défilent de droite à gauche. Certaines sont "Empowered". Le joueur surveille sa "Fever Meter" et le "Blueprint" de l'épée.
+1.  **VOIR :** Des notes (icônes d'enclume, seau, soufflet) défilent de droite à gauche. Certaines sont "Empowered". Le joueur surveille sa "Fever Meter" et le parchemin de progression.
 2.  **AGIR :** Le joueur appuie sur la touche correspondant à la PISTE sur laquelle la note arrive, au moment où elle atteint la zone de validation à gauche.
 3.  **FEEDBACK & CONSÉQUENCE :**
     - **"Perfect" :** Fait monter la "Fever Meter", rapporte beaucoup de points, active le bonus "Empowered", réinitialise le compteur de miss.
@@ -64,21 +64,21 @@
 
 #### **2.6. Évolution de l'Épée et Checkpoints de Progression**
 
-- **Lien Score-Épée :** L'apparence de l'épée est par défaut déterminée par le score total ACTUEL du joueur, **indépendamment de son niveau de difficulté**.
+- **Lien Score-Épée (Affichage sur le Parchemin) :** L'apparence de l'épée, **visible sur le parchemin à gauche de l'écran**, est déterminée par le score total ACTUEL du joueur, indépendamment de son niveau de difficulté.
 - **Promotion & Rétrogradation Visuelle :**
-  - **Promotion :** Si le score dépasse le seuil d'une nouvelle épée, celle-ci est forgée, améliorant son apparence.
-  - **Rétrogradation :** Si le score redescend sous le seuil d'une épée, son apparence est rétrogradée... **sauf si un checkpoint a été atteint.**
+  - **Promotion :** Si le score dépasse le seuil d'une nouvelle épée, l'apparence de celle-ci est mise à jour sur le parchemin.
+  - **Rétrogradation :** Si le score redescend sous le seuil d'une épée, son apparence est rétrogradée sur le parchemin... **sauf si un checkpoint a été atteint.**
 - **Checkpoints d'Épée (Le Jalon de Progression) :**
   - **Système de Sauvegarde Visuelle :** Les checkpoints sont uniquement basés sur des paliers d'épées clés (par exemple, la 3ème épée, la 6ème, etc.).
-  - **Protection Contre la Rétrogradation :** Une fois qu'une épée-checkpoint est forgée, **l'apparence de l'arme ne pourra plus jamais être rétrogradée en dessous de ce palier**, même si le score du joueur chute ou qu'il régresse de plusieurs niveaux de difficulté. Cela offre au joueur un sentiment de sécurité et un accomplissement visuel tangible et permanent, détaché de la volatilité de la progression de niveau.
+  - **Protection Contre la Rétrogradation :** Une fois qu'une épée-checkpoint est forgée, **l'apparence de l'arme affichée sur le parchemin ne pourra plus jamais être rétrogradée en dessous de ce palier**, même si le score du joueur chute ou qu'il régresse de plusieurs niveaux de difficulté. Cela offre au joueur un sentiment de sécurité et un accomplissement visuel tangible et permanent, détaché de la volatilité de la progression de niveau.
 
 ### **3. Interface & Présentation (UI/UX)**
 
 #### **3.1. Disposition Générale de l'Écran**
 
-- **Centre :** La scène principale, avec le forgeron animé en action, l'enclume et l'épée évolutive.
+- **Centre :** La scène principale avec le forgeron animé. Sur l'enclume se trouve un **modèle d'épée statique et incandescent**, représentant la lame en cours de travail, qui ne change pas d'apparence.
 - **Haut :** La **Fever Meter**.
-- **Gauche :** Le **Parchemin "Blueprint"**, affichant l'épée dans son état final glorieux.
+- **Gauche :** Le **Parchemin de Progression**, affichant l'épée dans son état **ACTUEL**, reflétant le score et les checkpoints atteints.
 - **Bas :** La zone de jeu rythmique à trois pistes.
 - **Superposés :** Indicateurs de score, multiplicateur, pénalités.
 
@@ -92,14 +92,14 @@
 
 - **Audio :** Sons percutants pour Perfect, Miss, transition de niveau (haut/bas), pénalité.
 - **Visuel :** Chiffres de score avec impact, pénalités en rouge, flash de transition de niveau.
-- **Feedback de Rétrogradation :** Son de "fissure", perte d'éclat de l'épée. Son de "CRACK" pour la régression de niveau.
+- **Feedback de Rétrogradation :** Son de "fissure", perte d'éclat de l'épée sur le parchemin. Son de "CRACK" pour la régression de niveau.
 
 ### **4. Données du Jeu**
 
 - **Chart Data :** Un `chart` par niveau de difficulté.
 - **Génération dynamique :** Le statut "Empowered" est assigné via l'algorithme hybride.
 
-### **5. Scope pour la Game Jam (MVP - v1.1)**
+### **5. Scope pour la Game Jam (MVP - v1.2)**
 
 - Mise en place de la boucle de jeu de 20 secondes avec au moins 3 niveaux de difficulté.
 - Construction de l'UI de jeu respectant la maquette.
@@ -108,5 +108,5 @@
 - Implémentation complète du système de Fever Meter, des pénalités, et des **checkpoints visuels basés sur les épées**.
 - Le bonus "Empowered" qui se déclenche **uniquement sur un "Perfect"**.
 - Visuels et sons de base pour toutes les mécaniques.
-- 4-5 états visuels pour l'épée, dont au moins une épée-checkpoint.
+- 4-5 états visuels pour l'épée (affichés sur le parchemin), dont au moins une épée-checkpoint.
 - Pas de menus complexes, une expérience jouable de bout en bout.
