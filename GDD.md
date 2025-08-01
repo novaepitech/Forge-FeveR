@@ -2,11 +2,11 @@
 
 - **Jeu :** Forge FeveR
 - **Thème de la Jam :** Loop
-- **Version :** 0.5 (Jam - Checkpoint Update)
+- **Version :** 0.7 (Dynamic Sword & Checkpoint Update)
 
 ### **1. Vision & Concept (High Concept)**
 
-- **Pitch :** _Forge FeveR_ est un jeu de rythme arcade avec une touche de roguelite, où le joueur incarne un forgeron au tempérament de feu. En réussissant parfaitement des actions de forge en rythme, il doit faire monter une "Fever Meter" pour débloquer des multiplicateurs de score exponentiels. **Chaque partie offre des opportunités uniques grâce à un système de notes bonus randomisées**, transformant la quête de l'épée légendaire en un défi toujours renouvelé.
+- **Pitch :** _Forge FeveR_ est un jeu de rythme arcade avec une touche de roguelite, où le joueur incarne un forgeron au tempérament de feu. Au sein de courtes boucles musicales qui s'intensifient, le joueur doit réussir des actions en rythme pour débloquer des multiplicateurs de score exponentiels. Son score détermine dynamiquement l'état visuel de son épée, qui peut être promue ou rétrogradée, tandis que des checkpoints assurent que sa progression n'est jamais entièrement perdue.
 - **Piliers de Design :**
   1.  **Satisfaction Exponentielle :** Le plaisir vient de voir des chiffres exploser, passant de scores modestes à des gains colossaux en une fraction de seconde.
   2.  **Quête de la Perfection :** Le jeu ne récompense pas la médiocrité. Seule l'excellence (les "Perfects") permet de débloquer les multiplicateurs et les plus grandes récompenses.
@@ -14,109 +14,84 @@
   4.  **Punition des Erreurs :** Les erreurs consécutives sont sévèrement punies par un système de pénalités croissantes, renforçant l'importance de la précision.
 - **Genre :** Jeu de rythme, Jeu d'arcade, Roguelite-like.
 - **Le Twist sur le Thème "Loop" :**
-  - **Boucle Musicale :** La musique s'enrichit et devient plus complexe en fonction de la performance du joueur.
-  - **Boucle de Gameplay "Fever" :** Le joueur est dans un cycle constant pour attiser la "fièvre" de la forge. Il doit enchaîner les "Perfects" pour faire monter la jauge, sachant qu'elle redescend constamment et qu'un seul faux pas peut anéantir sa progression.
-  - **Boucle de Rejouabilité (Roguelite)** : La disposition des notes bonus ("Empowered") est générée aléatoirement à chaque partie, rendant chaque tentative unique et imprévisible.
-  - **Boucle de Pénalité :** Les miss consécutifs créent une spirale descendante punitive, forçant le joueur à briser le cycle en réussissant une note.
+    - **Boucle Musicale Additive :** Le jeu est construit sur une unique mélodie de base de 20 secondes qui se répète en boucle. À chaque "niveau" de difficulté, de nouvelles couches instrumentales s'ajoutent à cette boucle fondamentale.
+    - **Boucle de Gameplay "Fever" :** Le joueur est dans un cycle constant pour attiser la "fièvre" de la forge en enchaînant les "Perfects".
+    - **Boucle de Rejouabilité (Roguelite)** : La disposition des notes bonus ("Empowered") est générée aléatoirement à chaque partie.
+    - **Boucle de Pénalité :** Les miss consécutifs créent une spirale descendante punitive.
 
 ### **2. Mécaniques de Jeu (Gameplay)**
 
-#### **2.1. Core Loop (La Boucle Principale)**
+#### **2.1. Structure du Jeu & Progression par Boucles**
 
-1.  **VOIR :** Des notes défilent. Au début du niveau, certaines notes sont promues aléatoirement au rang "Empowered" et sont visuellement distinctes. Le joueur surveille sa "Fever Meter".
+- **La Boucle Fondamentale :** Le cœur du jeu est une boucle musicale simple d'environ **20 secondes** qui se répète continuellement.
+- **Le Système de "Niveaux" de Difficulté :**
+    - **Progression de la Difficulté :** La **première fois** que le score du joueur atteint un seuil de promotion pour une nouvelle épée, il débloque le niveau de difficulté supérieur de manière permanente.
+    - **Évolution Irréversible :** Une fois un niveau de difficulté débloqué, le jeu ne reviendra jamais en arrière. La boucle de notes contiendra toujours les motifs de ce niveau, même si le score total ou l'état visuel de l'épée redescendent.
+- **Transition Fluide ("Level Up!") :** Le passage à un niveau de difficulté supérieur se fait sans interruption (flash, son "SHIIIING", courte pause sans notes).
+
+#### **2.2. Core Loop (dans chaque boucle de 20s)**
+
+1.  **VOIR :** Des notes défilent. Certaines sont "Empowered". Le joueur surveille sa "Fever Meter".
 2.  **AGIR :** Le joueur exécute l'action de forge correspondante au bon moment.
 3.  **FEEDBACK & CONSÉQUENCE :**
-    - **"Perfect" :** Coup critique ! Fait grimper significativement la "Fever Meter". Le joueur gagne une grande quantité de points de base, multipliés par son `ScoreMultiplier`. **Si la note est "Empowered", le joueur obtient un bonus de score massif ("Bonus Critique") en plus, mais UNIQUEMENT sur un Perfect.** **Remet à zéro le compteur de miss consécutifs.**
-    - **"Good" / "OK" :** Coup Imparfait. Apporte peu de points de base. Applique une pénalité mineure à la "Fever Meter". **Sur une note "Empowered", ces jugements ne déclenchent AUCUN bonus et sont traités comme des coups normaux.** L'opportunité du bonus est perdue. **Remet à zéro le compteur de miss consécutifs.**
-    - **"Miss" :** Échec cuisant ! La "Fever Meter" et le `ScoreMultiplier` sont **instantanément réinitialisés à zéro/x1**. Aucun point n'est marqué. **Applique une pénalité de score croissante basée sur les miss consécutifs.**
-4.  **PROGRESSER :** La "Fever Meter" débloque des multiplicateurs. Le score total fait évoluer l'épée, qui peut maintenant être promue ou rétrogradée.
+    - **"Perfect" :** Fait monter la "Fever Meter", rapporte beaucoup de points, active le bonus "Empowered", réinitialise le compteur de miss.
+    - **"Good" / "OK" :** Apporte peu de points, pénalise légèrement la "Fever Meter", ne déclenche pas le bonus, réinitialise le compteur de miss.
+    - **"Miss" :** Réinitialise "Fever Meter" et multiplicateur, apporte 0 point, et applique une pénalité de score croissante.
 
-#### **2.2. Le Système de "Fever Meter" & Multiplicateurs**
+#### **2.3. Le Système de "Fever Meter" & Multiplicateurs**
 
-- **La Jauge :** Une barre de progression qui ne se remplit **QU'AVEC des "Perfects"**.
-- **Baisse Continue :** La jauge se vide lentement mais constamment avec le temps ET subit des pénalités mineures sur les "Good"/"OK".
-- **Multiplicateurs Exponentiels : x2, x4, x8, x16, x32 (Mode "Supernova Forge").**
-- **Paliers de la Fever Meter :**
-  - 0-19% : x1 (Pas de multiplicateur)
-  - 20-39% : x2
-  - 40-59% : x4
-  - 60-79% : x8
-  - 80-94% : x16
-  - 95-100% : x32 (Supernova Forge)
+- **La Jauge :** Se remplit **QU'AVEC des "Perfects"**.
+- **Baisse Continue :** La jauge se vide lentement avec le temps ET subit des pénalités sur les "Good"/"OK".
+- **Multiplicateurs Exponentiels : x2, x4, x8, x16, x32.**
 
-#### **2.3. Système de Pénalités et Checkpoints**
+#### **2.4. Système de Pénalités et Checkpoints de Score (Planchers Numériques)**
 
-- **Pénalité Progressive :** Chaque miss consécutif applique une pénalité de score qui double à chaque occurrence :
-  - **1er miss :** -500 points
-  - **2ème miss consécutif :** -1000 points
-  - **3ème miss consécutif :** -2000 points
-  - **4ème miss consécutif :** -4000 points
-  - Et ainsi de suite, doublant à chaque fois...
-- **Reset des Pénalités :** Dès qu'le joueur réussit une note (Perfect, Good, ou OK), le compteur de miss consécutifs est remis à zéro et la prochaine pénalité de miss reviendra à -500 points.
-- **Score Checkpoints (Planchers de Sécurité) :** Pour contrebalancer la dureté des pénalités, des paliers de score "checkpoints" sont mis en place. Une fois qu'un de ces paliers est dépassé, le score total du joueur ne pourra **plus jamais descendre en dessous de cette valeur** pour le reste de la partie.
-- **Protection du Score :** Le score total ne peut jamais descendre en dessous du dernier checkpoint atteint (ou de 0 si aucun n'a été atteint).
-- **Impact Psychologique :** Ce système crée une tension croissante et encourage fortement le joueur à briser la chaîne de miss le plus rapidement possible, tout en offrant des moments de soulagement en atteignant un checkpoint.
+*Cette section concerne UNIQUEMENT la valeur numérique du score.*
 
-#### **2.4. Scoring & Randomisation des Notes "Empowered"**
+- **Pénalité Progressive :** Chaque miss consécutif applique une pénalité de score qui double : `-500`, `-1000`, etc.
+- **Reset des Pénalités :** Toute réussite (Perfect, Good, OK) réinitialise le compteur de miss.
+- **Score Checkpoints :** Des paliers de score (ex: 20 000, 60 000) servent de **planchers de sécurité**. Le score total ne pourra jamais descendre en dessous du dernier checkpoint numérique atteint.
 
-- Le scoring est conçu pour créer des pics de tension et des récompenses spectaculaires.
-- **Score de Base :**
-  - **Perfect :** 1000 points de base
-  - **Good :** 250 points de base
-  - **OK :** 50 points de base
-  - **Miss :** 0 points + pénalité progressive
+#### **2.5. Scoring & Randomisation des Notes "Empowered"**
 
+- **Score de Base :** Perfect : 1000 ; Good : 250 ; OK : 50.
 - **Système de "Braises Divines" (Notes Empowered) :**
-  - **Génération Procédurale :** Au début de chaque partie, le jeu identifie les "nouvelles" notes introduites à chaque palier de difficulté de la chanson. Chacune de ces notes a une chance (ex: 30%) d'être promue au rang "Empowered" pour cette partie uniquement.
-  - **Le Pari du "Perfect" :** Le statut "Empowered" est une opportunité "tout ou rien". Son avantage ne se manifeste QUE sur un "Perfect".
-    - **Perfect sur Empowered :** Déclenche un **"Bonus Critique"**, ajoutant une grande quantité de points supplémentaires (ex: +1500, pour un total de 2500) AVANT l'application du multiplicateur. C'est le chemin vers les scores légendaires.
-    - **Good/OK sur Empowered :** La note est traitée comme une note standard. L'opportunité du bonus est manquée, augmentant la tension pour la prochaine note "Empowered".
+  - **Génération Procédurale :** Au début de chaque passage à un niveau de difficulté supérieur, les "nouvelles" notes ont une chance d'être promues "Empowered".
+  - **Le Pari du "Perfect" :** Le bonus "Empowered" (ex: +1500 points) ne se déclenche QUE sur un "Perfect".
 
-#### **2.5. Évolution Dynamique de l'Épée**
+#### **2.6. Évolution Dynamique de l'Épée**
 
-- L'état de l'épée est un indicateur **dynamique** de la performance actuelle du joueur. Contrairement à une progression permanente, l'épée peut être **promue à un état supérieur ou rétrogradée à un état inférieur** en fonction du score total.
-- **États de l'épée :** Lingot -> Lame brute -> Lame affûtée -> etc. Le dernier niveau, atteint avec un score très élevé, devrait être visuellement spectaculaire.
-- **Promotion & Rétrogradation :** Si le score du joueur dépasse le seuil d'une nouvelle épée, elle est améliorée. Cependant, si le score redescend sous le seuil de l'épée actuelle (à cause de pénalités de miss), elle est visuellement **rétrogradée**. Cela crée une tension constante pour maintenir un score élevé.
-- **Paliers de Score Configurables :** [10000, 25000, 50000] par défaut, permettant une progression visuelle claire de la réussite.
+L'état visuel de l'épée est un thermomètre de la performance actuelle du joueur, indépendant des niveaux de difficulté débloqués.
+
+-   **Lien Strict au Score :** L'apparence de l'épée (Lingot, Lame Brute, etc.) est **strictement et uniquement déterminée par le score total ACTUEL du joueur**.
+-   **Promotion & Rétrogradation Visuelle :**
+    -   **Promotion :** Si le score du joueur dépasse le seuil d'une épée supérieure (ex: 50 000 points), elle se transforme visuellement. C'est à ce moment, et **seulement la première fois**, que le niveau de difficulté des notes est augmenté de façon permanente.
+    -   **Rétrogradation :** Si le score redescend sous le seuil de l'épée actuelle (ex: passe de 51 000 à 48 000), elle est visuellement **rétrogradée** à l'état inférieur.
+-   **Checkpoints d'Épée (Planchers Visuels) :**
+    -   Pour récompenser la progression, certains niveaux d'épée (ex: "Lame Affûtée" à 25 000 pts) agissent comme des **"checkpoints visuels" permanents**.
+    -   Une fois qu'un de ces paliers est activé, **l'apparence de l'épée ne pourra plus jamais être rétrogradée en dessous de cet état**, même si le score total redescend plus bas.
+    -   **Exemple :** Le joueur atteint le checkpoint visuel "Lame Affûtée" (25 000 pts), puis son score retombe à 15 000. Son score numérique sera de 15 000, mais son épée restera visuellement une "Lame Affûtée".
 
 ### **3. Interface & Présentation (UI/UX)**
 
-- **Disposition de l'Écran :** (Identique à la v0.1, basée sur la maquette).
+- **Disposition de l'Écran :** (Basée sur la maquette initiale).
 - **Feedback Joueur Clé :**
-  - **Audio :**
-    - Un son **CRÉPITANT** et puissant pour le remplissage de la "Fever Meter" sur un "Perfect".
-    - Musique dynamique : L'atteinte de nouveaux paliers de multiplicateur (x8, x16...) ajoute des couches instrumentales épiques à la musique.
-    - Son d'échec BRUTAL pour le "Miss" qui réinitialise la jauge.
-    - **Son de pénalité spécifique pour les miss consécutifs, de plus en plus dramatique.**
-  - **Visuel :**
-    - La "Fever Meter" doit pulser ou prendre feu lorsqu'elle est presque pleine.
-    - Le passage à un multiplicateur supérieur doit déclencher un flash à l'écran, un effet visuel sur l'épée (elle devient plus incandescente).
-    - **Les chiffres du score doivent sauter, grossir et s'estomper avec style**. C'est crucial pour le feeling "Balatro". "+32 000" doit être plus gros et plus impactant que "+1 000".
-    - **Les pénalités de miss doivent être affichées visuellement en rouge, avec une taille croissante pour montrer l'escalade : "-500", "-1000", "-2000", etc.**
-    - **Indicateur visuel du nombre de miss consécutifs** pour créer de la tension.
+    - **Audio :** Sons spécifiques et percutants pour chaque action majeure (Perfect, Miss, transition de niveau, pénalité...).
+    - **Visuel :** Chiffres de score avec impact (style Balatro), affichage des pénalités en rouge, indicateurs visuels pour le Fever Meter. Feedback de transition fluide (flash, onde de choc, etc.).
+    - **Feedback de Rétrogradation :** La rétrogradation de l'épée doit être accompagnée d'un feedback visuel et sonore distinct mais moins sévère qu'un "Miss". Par exemple, un son de "fissure" et l'épée qui perd brièvement son éclat.
 
 ### **4. Données du Jeu**
 
-- **Chart Data :** La structure reste la même, mais son utilisation change.
-  - `{"time": float, "lane": int, "input": string}`. (Le `type` est maintenant géré dynamiquement).
-  - **Processus d'Initialisation** : Le "type" de note ("normal" ou "empowered") n'est plus stocké dans le chart, mais assigné dans un tableau temporaire généré au début de chaque partie par l'algorithme de randomisation.
+- **Chart Data :** Un `chart` par niveau de difficulté, contenant les nouvelles notes à ajouter à la boucle.
+- **Génération dynamique :** Le statut "Empowered" est assigné par un algorithme au début de chaque partie, il n'est pas stocké dans le chart.
 
-### **5. Scope pour la Game Jam (MVP - v0.5)**
+### **5. Scope pour la Game Jam (MVP - v0.7)**
 
-- **1 seul niveau/chanson** d'environ 2 minutes.
-- Implémentation complète du système de **Fever Meter**.
-- Multiplicateurs exponentiels **(x2 à x32)** fonctionnels.
-- **Système de pénalités progressives pour les miss consécutifs** complètement implémenté.
-- **Implémentation du système de Score Checkpoints.**
-- **Mise en place du système de promotion/rétrogradation de l'épée.**
-- **Mise en place du système de randomisation des notes 'Empowered' au début de chaque partie.**
-- Le bonus "Empowered" qui se déclenche **uniquement sur un "Perfect"**.
-- **Visuels et sons de base pour le feedback :**
-  - Différenciation visuelle claire des notes "Empowered".
-  - Affichage du score avec des chiffres qui ont de l'impact (taille, couleur).
-  - **Affichage visuel des pénalités de miss avec escalade dramatique.**
-  - Un son pour "Perfect", un pour "Miss", un pour "Empowered Perfect".
-  - **Sons spécifiques pour les miss consécutifs de plus en plus dramatiques.**
-- 4-5 états visuels pour l'épée, liés dynamiquement au score total.
-- Pas de menus complexes.
-- **Debug console affichant les informations de miss consécutifs et pénalités pour le développement.**
+- Mise en place de la boucle de jeu de 20 secondes avec au moins 3 niveaux de difficulté et des transitions fluides.
+- Implémentation complète du système de Fever Meter, des pénalités, et de la randomisation.
+- **Implémentation du système de Score Checkpoints (planchers numériques).**
+- **Implémentation du système d'évolution de l'épée STRICTEMENT basé sur le score.**
+- **Mise en place des "Checkpoints d'Épée" (planchers visuels) pour bloquer la rétrogradation à certains paliers.**
+- Visuels et sons de base pour toutes les mécaniques, y compris la promotion ET la rétrogradation de l'épée.
+- 4-5 états visuels pour l'épée.
+- Pas de menus complexes, une expérience jouable de bout en bout.
