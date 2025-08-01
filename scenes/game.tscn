@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://b3pm2nt526yr7"]
+[gd_scene load_steps=9 format=3 uid="uid://b3pm2nt526yr7"]
 
 [ext_resource type="Script" uid="uid://bh6srqu5h8vbj" path="res://scripts/game.gd" id="1_uwrxv"]
 [ext_resource type="Texture2D" uid="uid://pdscnrc6xxkt" path="res://assets/sprites/swords/sword_level_0.webp" id="2_iywne"]
@@ -9,6 +9,11 @@
 
 [sub_resource type="LabelSettings" id="LabelSettings_04n7w"]
 font_size = 32
+
+[sub_resource type="Environment" id="Environment_p57ef"]
+background_mode = 3
+glow_enabled = true
+glow_blend_mode = 1
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_uwrxv")
@@ -65,3 +70,6 @@ offset_right = -45.0
 offset_bottom = 72.0
 grow_horizontal = 0
 show_percentage = false
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_p57ef")
