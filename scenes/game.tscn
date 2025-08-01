@@ -17,6 +17,7 @@ glow_blend_mode = 1
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_uwrxv")
+track_y_positions = Array[float]([440.0, 490.0, 540.0])
 sword_score_thresholds = Array[int]([65000, 150000, 450000, 800000])
 sword_state_textures = Array[Texture2D]([ExtResource("2_iywne"), ExtResource("3_p57ef"), ExtResource("4_u5sy4"), ExtResource("5_gee14"), ExtResource("6_p57ef")])
 
@@ -26,9 +27,9 @@ position = Vector2(150, 256)
 [node name="Track" type="ColorRect" parent="."]
 anchors_preset = -1
 offset_left = 232.0
-offset_top = 443.0
+offset_top = 403.0
 offset_right = 880.0
-offset_bottom = 537.0
+offset_bottom = 577.0
 color = Color(0.207512, 0.207512, 0.207512, 1)
 
 [node name="SpawnPoint" type="Marker2D" parent="."]

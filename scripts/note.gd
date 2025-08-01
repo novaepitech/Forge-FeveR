@@ -1,3 +1,4 @@
+# Forge FeveR/scripts/note.gd (MIS À JOUR)
 extends Area2D
 
 signal missed
@@ -7,17 +8,20 @@ var game_node
 var spawn_position: Vector2
 var target_position: Vector2
 
+var track_id: int = 0
+
 # A state to prevent multiple behaviors (e.g., being missed after being hit).
 var is_hit: bool = false
 
-func setup(p_target_time: float, p_game_node, p_spawn_pos: Vector2, p_target_pos: Vector2):
+func setup(p_target_time: float, p_game_node, p_spawn_pos: Vector2, p_target_pos: Vector2, p_track_id: int):
 	self.target_time = p_target_time
 	self.game_node = p_game_node
 	self.spawn_position = p_spawn_pos
 	self.target_position = p_target_pos
 	self.global_position = spawn_position
+	self.track_id = p_track_id
 
-func _process(delta):
+func _process(_delta: float):
 	if not is_instance_valid(game_node) or is_hit:
 		return
 
