@@ -2,7 +2,7 @@
 
 - **Jeu :** Forge FeveR
 - **Thème de la Jam :** Loop
-- **Version :** 0.9 (Hybrid Empowered System)
+- **Version :** 1.0 (Checkpoint System Refined)
 
 ### **1. Vision & Concept (High Concept)**
 
@@ -14,10 +14,10 @@
   4.  **Punition des Erreurs :** Les erreurs consécutives sont sévèrement punies par un système de pénalités croissantes, renforçant l'importance de la précision.
 - **Genre :** Jeu de rythme, Jeu d'arcade, Roguelite-like.
 - **Le Twist sur le Thème "Loop" :**
-    - **Boucle Musicale Additive :** Le jeu est construit sur une unique mélodie de base de 20 secondes qui se répète en boucle. À chaque "niveau" de difficulté, de nouvelles couches instrumentales s'ajoutent à cette boucle fondamentale.
-    - **Boucle de Gameplay "Fever" :** Le joueur est dans un cycle constant pour attiser la "fièvre" de la forge en enchaînant les "Perfects".
-    - **Boucle de Rejouabilité (Roguelite)** : La promotion des notes en "Empowered" suit une logique hybride : les nouvelles notes d'un niveau ont une forte chance d'être promues, tandis que les anciennes peuvent l'être par surprise, garantissant une rejouabilité tendue et imprévisible.
-    - **Boucle de Pénalité :** Les miss consécutifs créent une spirale descendante punitive.
+  - **Boucle Musicale Additive :** Le jeu est construit sur une unique mélodie de base de 20 secondes qui se répète en boucle. À chaque "niveau" de difficulté, de nouvelles couches instrumentales s'ajoutent à cette boucle fondamentale.
+  - **Boucle de Gameplay "Fever" :** Le joueur est dans un cycle constant pour attiser la "fièvre" de la forge en enchaînant les "Perfects".
+  - **Boucle de Rejouabilité (Roguelite)** : La promotion des notes en "Empowered" suit une logique hybride : les nouvelles notes d'un niveau ont une forte chance d'être promues, tandis que les anciennes peuvent l'être par surprise, garantissant une rejouabilité tendue et imprévisible.
+  - **Boucle de Pénalité :** Les miss consécutifs créent une spirale descendante punitive, contrebalancée par des checkpoints de progression tangibles.
 
 ### **2. Mécaniques de Jeu (Gameplay)**
 
@@ -25,8 +25,8 @@
 
 - **La Boucle Fondamentale :** Le cœur du jeu est une boucle musicale simple d'environ **20 secondes** qui se répète continuellement tout au long de la partie.
 - **Le Système de "Niveaux" de Difficulté :**
-    - **Progression de la Difficulté :** La **première fois** que le score du joueur atteint un seuil de promotion pour une nouvelle épée, il débloque le niveau de difficulté supérieur de manière permanente.
-    - **Évolution Irréversible :** Une fois un niveau de difficulté débloqué, le jeu ne reviendra jamais en arrière. La boucle de notes contiendra toujours les motifs de ce niveau, même si le score total ou l'état visuel de l'épée redescendent.
+  - **Progression de la Difficulté :** La **première fois** que le score du joueur atteint un seuil de promotion pour une nouvelle épée, il débloque le niveau de difficulté supérieur de manière permanente.
+  - **Évolution Irréversible :** Une fois un niveau de difficulté débloqué, le jeu ne reviendra jamais en arrière. La boucle de notes contiendra toujours les motifs de ce niveau.
 - **Transition Fluide ("Level Up!") :** Le passage à un niveau de difficulté supérieur se fait sans interruption ni écran de chargement (flash, son "SHIIIING", courte pause sans notes).
 
 #### **2.2. Core Loop (dans chaque boucle de 20s)**
@@ -45,70 +45,63 @@
 - **Multiplicateurs Exponentiels : x2, x4, x8, x16, x32 (Mode "Supernova Forge").**
 - **Représentation Visuelle :** La Fever Meter est une longue barre horizontale **segmentée**. Chaque segment représente un palier de multiplicateur. Atteindre le palier maximum (x32) fait s'embraser **une flamme au bout de la jauge**, indiquant l'entrée en mode "Supernova Forge".
 
-#### **2.4. Système de Pénalités et Checkpoints de Score (Planchers Numériques)**
+#### **2.4. Système de Pénalités de Score**
 
 - **Pénalité Progressive :** Chaque miss consécutif applique une pénalité de score qui double : `-500`, `-1000`, etc.
-- **Reset des Pénalités :** Toute réussite réinitialise le compteur de miss.
-- **Score Checkpoints :** Des paliers de score (ex: 20 000, 60 000) servent de **planchers de sécurité**. Le score total ne pourra jamais descendre en dessous du dernier checkpoint numérique atteint.
+- **Reset des Pénalités :** Toute réussite ("Perfect", "Good", "OK") réinitialise le compteur de miss et stoppe la progression des pénalités.
 
 #### **2.5. Scoring & Système de "Braises Divines" (Notes Empowered)**
 
 - **Score de Base :** Perfect : 1000 ; Good : 250 ; OK : 50.
 - **Le Pari du "Perfect" :** Le bonus d'une note "Empowered" (ex: +1500 points) ne se déclenche **QUE sur un "Perfect"**.
-- **Génération Hybride des "Braises Divines" :** Le système est conçu pour récompenser à la fois la maîtrise de la nouveauté et la vigilance constante.
-  - **"Braises Vives" (Haute Probabilité) :** Les **nouvelles notes** introduites au niveau de difficulté actuel ont une **chance ÉLEVÉE** (ex: 15%) de devenir "Empowered". Cela pousse le joueur à apprendre et maîtriser les nouveaux patterns pour maximiser son score.
-  - **"Braises Anciennes" (Basse Probabilité) :** Les notes des **niveaux de difficulté précédents** ont une **chance FAIBLE mais non-nulle** (ex: 2%) de devenir "Empowered". Cela crée de la surprise, maintient la tension et empêche le joueur de jouer les anciens patterns en "pilote automatique". Chaque note reste une opportunité potentielle.
+- **Génération Hybride des "Braises Divines" :**
+  - **"Braises Vives" (Haute Probabilité) :** Les **nouvelles notes** introduites au niveau de difficulté actuel ont une **chance ÉLEVÉE** (ex: 15%) de devenir "Empowered".
+  - **"Braises Anciennes" (Basse Probabilité) :** Les notes des **niveaux de difficulté précédents** ont une **chance FAIBLE mais non-nulle** (ex: 2%) de devenir "Empowered".
 
-#### **2.6. Évolution Dynamique de l'Épée**
+#### **2.6. Évolution de l'Épée et Checkpoints de Progression**
 
-- **Lien Strict au Score :** L'apparence de l'épée est **strictement et uniquement déterminée par le score total ACTUEL du joueur**.
-- **Promotion & Rétrogradation Visuelle :**
-    - **Promotion :** Si le score dépasse un seuil, l'épée se transforme visuellement. **Seulement la première fois**, cela déclenche le passage au niveau de difficulté supérieur.
-    - **Rétrogradation :** Si le score redescend sous ce seuil, l'épée est visuellement rétrogradée.
-- **Checkpoints d'Épée (Planchers Visuels) :**
-    - Certains niveaux d'épée (ex: "Lame Affûtée") agissent comme des **"checkpoints visuels" permanents**. Une fois cet état atteint, **l'apparence de l'épée ne pourra plus jamais être rétrogradée en dessous**, même si le score redescend plus bas.
+- **Lien Score-Épée :** L'apparence de l'épée est par défaut déterminée par le score total ACTUEL du joueur.
+- **Promotion & Rétrogradation :**
+  - **Promotion :** Si le score dépasse le seuil d'une nouvelle épée, celle-ci est forgée. La **première fois**, cela déclenche le passage au niveau de difficulté supérieur.
+  - **Rétrogradation :** Si le score redescend sous le seuil d'une épée, son apparence est rétrogradée... **sauf si un checkpoint a été atteint.**
+- **Checkpoints d'Épée (Le Jalon de Progression) :**
+  - **Système de Sauvegarde Unique :** Les checkpoints sont uniquement basés sur des paliers d'épées clés (par exemple, la 3ème épée, la 6ème, etc.). C'est le seul système de checkpoint du jeu.
+  - **Protection Contre la Rétrogradation :** Une fois qu'une épée-checkpoint est forgée, **l'apparence de l'arme ne pourra plus jamais être rétrogradée en dessous de ce palier**, même si le score du joueur chute bien en deçà du seuil requis. Cela offre au joueur un sentiment de sécurité et un accomplissement tangible et permanent.
 
 ### **3. Interface & Présentation (UI/UX)**
 
 #### **3.1. Disposition Générale de l'Écran**
 
-*Basée sur la maquette visuelle initiale.*
-
--   **Centre :** La scène principale, avec le forgeron animé en action, l'enclume et l'épée évolutive.
--   **Haut :** La **Fever Meter**.
--   **Gauche :** Le **Parchemin "Blueprint"**, affichant en permanence une silhouette ou un dessin de l'épée dans son état final glorieux, servant d'objectif visuel constant.
--   **Bas :** La zone de jeu rythmique, avec ses trois pistes et sa zone de validation.
--   **Superposés :** Les indicateurs de score, multiplicateur, et pénalités.
+- **Centre :** La scène principale, avec le forgeron animé en action, l'enclume et l'épée évolutive.
+- **Haut :** La **Fever Meter**.
+- **Gauche :** Le **Parchemin "Blueprint"**, affichant l'épée dans son état final glorieux.
+- **Bas :** La zone de jeu rythmique à trois pistes.
+- **Superposés :** Indicateurs de score, multiplicateur, pénalités.
 
 #### **3.2. Représentation Visuelle du Gameplay**
 
-*Cette section clarifie le fonctionnement visuel des pistes de rythme.*
-
--   **Flux des Notes :** Les notes se déplacent horizontalement de **droite à gauche** sur l'écran.
--   **Zone de Validation :** Une zone de validation fixe est située sur le **côté gauche de l'écran**. C'est dans cette zone que le joueur doit valider les notes.
--   **Pistes Thématiques :**
-    -   Chaque piste est associée à une **action de forge** et un **input** spécifique.
-    -   Les **objets qui voyagent** sur les pistes sont des icônes de l'action requise (enclume pour marteler, seau pour tremper, soufflet pour attiser).
-    -   L'input correct est déterminé par la **piste sur laquelle la note arrive**, et non par la forme de la note elle-même (Ex: Touche HAUT pour la piste du haut, TOUJOURS).
+- **Flux des Notes :** Droite à gauche.
+- **Zone de Validation :** Côté gauche de l'écran.
+- **Pistes Thématiques :** L'input est déterminé par la piste, pas par l'icône de la note (enclume, seau, soufflet).
 
 #### **3.3. Feedback Joueur Clé**
 
-- **Audio :** Sons spécifiques et percutants pour chaque action majeure (Perfect, Miss, transition de niveau, pénalité...).
-- **Visuel :** Chiffres de score avec impact (style Balatro), affichage des pénalités en rouge. Feedback de transition fluide (flash, onde de choc, etc.).
-- **Feedback de Rétrogradation :** La rétrogradation de l'épée doit être accompagnée d'un feedback visuel et sonore distinct (ex: son de "fissure", l'épée perd son éclat).
+- **Audio :** Sons percutants pour Perfect, Miss, transition, pénalité.
+- **Visuel :** Chiffres de score avec impact, pénalités en rouge, flash de transition.
+- **Feedback de Rétrogradation :** Son de "fissure", perte d'éclat de l'épée.
 
 ### **4. Données du Jeu**
 
-- **Chart Data :** Un `chart` par niveau de difficulté, contenant les nouvelles notes à ajouter à la boucle.
-- **Génération dynamique :** Le statut "Empowered" est assigné par un algorithme au début de chaque partie en suivant le système hybride ("Braises Vives" / "Braises Anciennes"). Il n'est pas stocké dans les charts.
+- **Chart Data :** Un `chart` par niveau de difficulté.
+- **Génération dynamique :** Le statut "Empowered" est assigné via l'algorithme hybride.
 
-### **5. Scope pour la Game Jam (MVP - v0.9)**
+### **5. Scope pour la Game Jam (MVP - v1.0)**
 
-- Mise en place de la boucle de jeu de 20 secondes avec au moins 3 niveaux de difficulté et des transitions fluides.
-- **Construction de l'UI de jeu respectant la disposition de la maquette** (zone de jeu en bas, Blueprint à gauche, etc.).
-- **Mise en place de la logique de jeu à 3 pistes de droite à gauche**.
-- Implémentation complète du système de Fever Meter, des pénalités, des checkpoints de score, des checkpoints d'épée et de la **randomisation hybride "Empowered"**.
+- Mise en place de la boucle de jeu de 20 secondes avec au moins 3 niveaux de difficulté.
+- Construction de l'UI de jeu respectant la maquette.
+- Mise en place de la logique de jeu à 3 pistes.
+- Implémentation complète du système de Fever Meter, des pénalités, et des **checkpoints de progression basés sur les épées**.
 - Le bonus "Empowered" qui se déclenche **uniquement sur un "Perfect"**.
 - Visuels et sons de base pour toutes les mécaniques.
-- 4-5 états visuels pour l'épée.
+- 4-5 états visuels pour l'épée, dont au moins une épée-checkpoint.
 - Pas de menus complexes, une expérience jouable de bout en bout.
