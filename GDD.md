@@ -2,7 +2,7 @@
 
 - **Jeu :** Forge FeveR
 - **Thème de la Jam :** Loop
-- **Version :** 1.2
+- **Version :** 1.3 - Paliers
 
 ### **1. Vision & Concept (High Concept)**
 
@@ -64,13 +64,20 @@
 
 #### **2.6. Évolution de l'Épée et Checkpoints de Progression**
 
-- **Lien Score-Épée (Affichage sur le Parchemin) :** L'apparence de l'épée, **visible sur le parchemin à gauche de l'écran**, est déterminée par le score total ACTUEL du joueur, indépendamment de son niveau de difficulté.
-- **Promotion & Rétrogradation Visuelle :**
-  - **Promotion :** Si le score dépasse le seuil d'une nouvelle épée, l'apparence de celle-ci est mise à jour sur le parchemin.
-  - **Rétrogradation :** Si le score redescend sous le seuil d'une épée, son apparence est rétrogradée sur le parchemin... **sauf si un checkpoint a été atteint.**
-- **Checkpoints d'Épée (Le Jalon de Progression) :**
-  - **Système de Sauvegarde Visuelle :** Les checkpoints sont uniquement basés sur des paliers d'épées clés (par exemple, la 3ème épée, la 6ème, etc.).
-  - **Protection Contre la Rétrogradation :** Une fois qu'une épée-checkpoint est forgée, **l'apparence de l'arme affichée sur le parchemin ne pourra plus jamais être rétrogradée en dessous de ce palier**, même si le score du joueur chute ou qu'il régresse de plusieurs niveaux de difficulté. Cela offre au joueur un sentiment de sécurité et un accomplissement visuel tangible et permanent, détaché de la volatilité de la progression de niveau.
+- **Structure par Paliers et Niveaux :**
+  - La progression globale du joueur est visualisée par l'épée affichée sur le parchemin. Son apparence est directement liée au score total.
+  - Cette progression est divisée en **Paliers de qualité** (ex : Fer, Acier, Argent, Or...).
+  - Chaque Palier est lui-même subdivisé en **3 Niveaux d'épée** (Niveau 1, Niveau 2, Niveau 3). Le joueur progresse à travers ces Niveaux en augmentant son score.
+
+- **Le Système de Checkpoint :**
+  - Un **checkpoint est activé dès que le joueur atteint un nouveau Palier de qualité** (en passant du Niveau 3 d'un palier au Niveau 1 du palier supérieur).
+  - Une fois un palier-checkpoint atteint, deux règles s'appliquent :
+    1.  **Plancher de Score :** Le score total du joueur ne pourra plus jamais descendre en dessous du score minimum requis pour atteindre ce palier.
+    2.  **Verrouillage Visuel :** L'apparence de l'épée sur le parchemin ne pourra plus jamais être rétrogradée en dessous du Niveau 1 de ce palier.
+
+- **Progression et Rétrogradation à l'Intérieur d'un Palier :**
+  - Tant que le joueur reste à l'intérieur d'un même palier, son apparence d'épée peut évoluer ou régresser.
+  - **Exemple :** Un joueur au **Palier 3, Niveau 2** qui subit des pénalités de score peut voir son épée régresser visuellement au **Palier 3, Niveau 1**. Cependant, grâce au checkpoint, il ne pourra jamais retomber au **Palier 2**, et son score ne descendra pas sous le seuil du Palier 3.
 
 ### **3. Interface & Présentation (UI/UX)**
 
@@ -99,14 +106,14 @@
 - **Chart Data :** Un `chart` par niveau de difficulté.
 - **Génération dynamique :** Le statut "Empowered" est assigné via l'algorithme hybride.
 
-### **5. Scope pour la Game Jam (MVP - v1.2)**
+### **5. Scope pour la Game Jam (MVP - v1.3)**
 
 - Mise en place de la boucle de jeu de 20 secondes avec au moins 3 niveaux de difficulté.
 - Construction de l'UI de jeu respectant la maquette.
 - Mise en place de la logique de jeu à 3 pistes.
 - Implémentation du système de progression dynamique par niveau (promotion, stagnation, régression) basé sur le pourcentage de réussite par boucle.
-- Implémentation complète du système de Fever Meter, des pénalités, et des **checkpoints visuels basés sur les épées**.
+- Implémentation complète du système de Fever Meter, des pénalités, et des **checkpoints de score et visuels basés sur les Paliers d'épées**.
 - Le bonus "Empowered" qui se déclenche **uniquement sur un "Perfect"**.
 - Visuels et sons de base pour toutes les mécaniques.
-- 4-5 états visuels pour l'épée (affichés sur le parchemin), dont au moins une épée-checkpoint.
+- Au moins 2 Paliers de qualité, chacun avec 3 Niveaux d'épée (total 6 apparences), incluant au moins un checkpoint.
 - Pas de menus complexes, une expérience jouable de bout en bout.
