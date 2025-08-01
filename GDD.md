@@ -2,7 +2,7 @@
 
 - **Jeu :** Forge FeveR
 - **Thème de la Jam :** Loop
-- **Version :** 0.8 (Final Mockup Sync)
+- **Version :** 0.9 (Hybrid Empowered System)
 
 ### **1. Vision & Concept (High Concept)**
 
@@ -16,7 +16,7 @@
 - **Le Twist sur le Thème "Loop" :**
     - **Boucle Musicale Additive :** Le jeu est construit sur une unique mélodie de base de 20 secondes qui se répète en boucle. À chaque "niveau" de difficulté, de nouvelles couches instrumentales s'ajoutent à cette boucle fondamentale.
     - **Boucle de Gameplay "Fever" :** Le joueur est dans un cycle constant pour attiser la "fièvre" de la forge en enchaînant les "Perfects".
-    - **Boucle de Rejouabilité (Roguelite)** : La disposition des notes bonus ("Empowered") est générée aléatoirement à chaque partie.
+    - **Boucle de Rejouabilité (Roguelite)** : La promotion des notes en "Empowered" suit une logique hybride : les nouvelles notes d'un niveau ont une forte chance d'être promues, tandis que les anciennes peuvent l'être par surprise, garantissant une rejouabilité tendue et imprévisible.
     - **Boucle de Pénalité :** Les miss consécutifs créent une spirale descendante punitive.
 
 ### **2. Mécaniques de Jeu (Gameplay)**
@@ -51,12 +51,13 @@
 - **Reset des Pénalités :** Toute réussite réinitialise le compteur de miss.
 - **Score Checkpoints :** Des paliers de score (ex: 20 000, 60 000) servent de **planchers de sécurité**. Le score total ne pourra jamais descendre en dessous du dernier checkpoint numérique atteint.
 
-#### **2.5. Scoring & Randomisation des Notes "Empowered"**
+#### **2.5. Scoring & Système de "Braises Divines" (Notes Empowered)**
 
 - **Score de Base :** Perfect : 1000 ; Good : 250 ; OK : 50.
-- **Système de "Braises Divines" (Notes Empowered) :**
-  - **Génération Procédurale :** Au début de chaque passage à un niveau de difficulté supérieur, les "nouvelles" notes ont une chance d'être promues "Empowered".
-  - **Le Pari du "Perfect" :** Le bonus "Empowered" (ex: +1500 points) ne se déclenche QUE sur un "Perfect".
+- **Le Pari du "Perfect" :** Le bonus d'une note "Empowered" (ex: +1500 points) ne se déclenche **QUE sur un "Perfect"**.
+- **Génération Hybride des "Braises Divines" :** Le système est conçu pour récompenser à la fois la maîtrise de la nouveauté et la vigilance constante.
+  - **"Braises Vives" (Haute Probabilité) :** Les **nouvelles notes** introduites au niveau de difficulté actuel ont une **chance ÉLEVÉE** (ex: 15%) de devenir "Empowered". Cela pousse le joueur à apprendre et maîtriser les nouveaux patterns pour maximiser son score.
+  - **"Braises Anciennes" (Basse Probabilité) :** Les notes des **niveaux de difficulté précédents** ont une **chance FAIBLE mais non-nulle** (ex: 2%) de devenir "Empowered". Cela crée de la surprise, maintient la tension et empêche le joueur de jouer les anciens patterns en "pilote automatique". Chaque note reste une opportunité potentielle.
 
 #### **2.6. Évolution Dynamique de l'Épée**
 
@@ -99,14 +100,14 @@
 ### **4. Données du Jeu**
 
 - **Chart Data :** Un `chart` par niveau de difficulté, contenant les nouvelles notes à ajouter à la boucle.
-- **Génération dynamique :** Le statut "Empowered" est assigné par un algorithme au début de chaque partie et n'est pas stocké dans le chart.
+- **Génération dynamique :** Le statut "Empowered" est assigné par un algorithme au début de chaque partie en suivant le système hybride ("Braises Vives" / "Braises Anciennes"). Il n'est pas stocké dans les charts.
 
-### **5. Scope pour la Game Jam (MVP - v0.8)**
+### **5. Scope pour la Game Jam (MVP - v0.9)**
 
 - Mise en place de la boucle de jeu de 20 secondes avec au moins 3 niveaux de difficulté et des transitions fluides.
 - **Construction de l'UI de jeu respectant la disposition de la maquette** (zone de jeu en bas, Blueprint à gauche, etc.).
 - **Mise en place de la logique de jeu à 3 pistes de droite à gauche**.
-- Implémentation complète du système de Fever Meter, des pénalités, des checkpoints de score, des checkpoints d'épée et de la randomisation "Empowered".
+- Implémentation complète du système de Fever Meter, des pénalités, des checkpoints de score, des checkpoints d'épée et de la **randomisation hybride "Empowered"**.
 - Le bonus "Empowered" qui se déclenche **uniquement sur un "Perfect"**.
 - Visuels et sons de base pour toutes les mécaniques.
 - 4-5 états visuels pour l'épée.
