@@ -59,7 +59,7 @@ position = Vector2(880, 490)
 [node name="TargetZone" type="Marker2D" parent="."]
 position = Vector2(228, 490)
 
-[node name="HintD" type="Label" parent="."]
+[node name="HintI" type="Label" parent="."]
 anchors_preset = -1
 offset_left = 208.0
 offset_top = 416.0
@@ -67,20 +67,7 @@ offset_right = 258.0
 offset_bottom = 466.0
 theme_override_font_sizes/font_size = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_h2q0q")
-text = "D"
-label_settings = SubResource("LabelSettings_qg2k1")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="HintF" type="Label" parent="."]
-anchors_preset = -1
-offset_left = 208.0
-offset_top = 466.0
-offset_right = 258.0
-offset_bottom = 516.0
-theme_override_font_sizes/font_size = 1
-theme_override_styles/normal = SubResource("StyleBoxFlat_h2q0q")
-text = "F"
+text = "I"
 label_settings = SubResource("LabelSettings_qg2k1")
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -88,12 +75,25 @@ vertical_alignment = 1
 [node name="HintJ" type="Label" parent="."]
 anchors_preset = -1
 offset_left = 208.0
+offset_top = 466.0
+offset_right = 258.0
+offset_bottom = 516.0
+theme_override_font_sizes/font_size = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_h2q0q")
+text = "J"
+label_settings = SubResource("LabelSettings_qg2k1")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HintN" type="Label" parent="."]
+anchors_preset = -1
+offset_left = 208.0
 offset_top = 516.0
 offset_right = 258.0
 offset_bottom = 566.0
 theme_override_font_sizes/font_size = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_h2q0q")
-text = "J"
+text = "N"
 label_settings = SubResource("LabelSettings_qg2k1")
 horizontal_alignment = 1
 vertical_alignment = 1
