@@ -6,8 +6,11 @@ var target_time: float = 0.0
 var game_node
 var spawn_position: Vector2
 var target_position: Vector2
-
 var track_id: int = 0
+
+# --- Cahier des Charges 2.B Addition ---
+# Flag to identify special notes for scoring and visual feedback.
+var is_empowered: bool = false
 
 # A state to prevent multiple behaviors (e.g., being missed after being hit).
 var is_hit: bool = false
@@ -37,13 +40,11 @@ func _process(_delta: float):
 	var progress = (current_song_time - spawn_time) / lookahead
 	self.global_position = spawn_position.lerp(target_position, progress)
 
-	# If the song time has exceeded the note's target time PLUS the widest judgment window,
-	# then it is definitively missed.
 	if current_song_time > target_time + game_node.timing_window_ok:
-		is_hit = true # "Lock" it to prevent sending the signal multiple times.
+		is_hit = true
 		emit_signal("missed")
-		queue_free() # The note self-destroys.
+		queue_free()
 
 func hit():
-	is_hit = true # Locks the note's state.
-	queue_free() # The note has fulfilled its role, it disappears.
+	is_hit = true
+	queue_free()
