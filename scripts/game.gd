@@ -123,10 +123,8 @@ var active_music_level: int = 0
 var is_awaiting_level_sync_hit: bool = false
 
 # --- UI Styles Variables ---
-var _style_level_active: StyleBox
-var _style_level_inactive: StyleBox
-var _settings_numeral_active: LabelSettings
-var _settings_numeral_inactive: LabelSettings
+var _settings_bar_active: LabelSettings
+var _settings_bar_inactive: LabelSettings
 
 # --- Node References ---
 @onready var spawn_pos_marker: Marker2D = $SpawnPoint
@@ -138,11 +136,11 @@ var _settings_numeral_inactive: LabelSettings
 @onready var loop_time_label: Label = $UI/LoopTimeLabel
 @onready var transition_feedback_label: Label = $UI/TransitionFeedbackLabel
 @onready var transition_feedback_timer: Timer = $TransitionFeedbackTimer
-@onready var tier_name_label: Label = $UI/TierDisplay/VBoxContainer/TierNameLabel
-@onready var level_segments: Array[Panel] = [
-	$UI/TierDisplay/VBoxContainer/LevelSegmentsContainer/LevelSegment1,
-	$UI/TierDisplay/VBoxContainer/LevelSegmentsContainer/LevelSegment2,
-	$UI/TierDisplay/VBoxContainer/LevelSegmentsContainer/LevelSegment3
+@onready var tier_name_label: Label = $UI/TierDisplay/TierNameLabel
+@onready var level_bars: Array[Label] = [
+	$UI/TierDisplay/LevelBarsContainer/LevelBar1,
+	$UI/TierDisplay/LevelBarsContainer/LevelBar2,
+	$UI/TierDisplay/LevelBarsContainer/LevelBar3,
 ]
 
 # --- Audio Node References ---
@@ -169,12 +167,9 @@ func _ready():
 
 
 func _capture_ui_styles():
-	# Using generic get() method to retrieve an override property,
-	# which is a robust solution to avoid issues with preload().
-	_style_level_active = level_segments[0].get("theme_override_styles/panel")
-	_style_level_inactive = level_segments[1].get("theme_override_styles/panel")
-	_settings_numeral_active = level_segments[0].get_node("Numeral").label_settings
-	_settings_numeral_inactive = level_segments[1].get_node("Numeral").label_settings
+	# Capture the LabelSettings for the active and inactive bars
+	_settings_bar_active = level_bars[0].label_settings
+	_settings_bar_inactive = level_bars[1].label_settings
 
 
 func reset_game_state():
@@ -524,16 +519,13 @@ func _update_tier_ui():
 	var tier_data = progression_data[current_tier_index]
 	tier_name_label.text = tier_data["name"]
 
-	for i in range(level_segments.size()):
-		var segment_panel = level_segments[i]
-		var numeral_label = segment_panel.get_node("Numeral")
-
-		if i == current_level_index:
-			segment_panel.add_theme_stylebox_override("panel", _style_level_active)
-			numeral_label.label_settings = _settings_numeral_active
+	for i in range(level_bars.size()):
+		var bar_label = level_bars[i]
+		# Cumulative logic: turn on all bars up to the current level index
+		if i <= current_level_index:
+			bar_label.label_settings = _settings_bar_active
 		else:
-			segment_panel.add_theme_stylebox_override("panel", _style_level_inactive)
-			numeral_label.label_settings = _settings_numeral_inactive
+			bar_label.label_settings = _settings_bar_inactive
 
 
 func _update_multiplier():

@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://b3pm2nt526yr7"]
+[gd_scene load_steps=21 format=3 uid="uid://b3pm2nt526yr7"]
 
 [ext_resource type="Script" uid="uid://bh6srqu5h8vbj" path="res://scripts/game.gd" id="1_uwrxv"]
 [ext_resource type="Texture2D" uid="uid://pdscnrc6xxkt" path="res://assets/sprites/swords/sword_level_0.webp" id="2_iywne"]
@@ -33,45 +33,24 @@ font_color = Color(1, 1, 1, 0.8)
 [sub_resource type="LabelSettings" id="LabelSettings_04n7w"]
 font_size = 32
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_main_tier_container"]
-bg_color = Color(0.05, 0.05, 0.05, 0.8)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.15, 0.15, 0.15, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
 [sub_resource type="LabelSettings" id="LabelSettings_tier_name"]
-font_size = 20
-font_color = Color(0.8, 0.7, 0.6, 1)
+font_color = Color(0.8, 0.75, 0.7, 0.85)
 outline_size = 2
 outline_color = Color(0, 0, 0, 0.5)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_active"]
-bg_color = Color(1, 0.75, 0, 0.8)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+[sub_resource type="LabelSettings" id="LabelSettings_bar_active"]
+font_size = 32
+font_color = Color(1, 0.8, 0.4, 1)
+outline_size = 1
+outline_color = Color(0, 0, 0, 0.5)
+shadow_size = 4
+shadow_color = Color(1, 0.6, 0, 0.5)
 
-[sub_resource type="LabelSettings" id="LabelSettings_level_numeral_active"]
-font_size = 28
-font_color = Color(0.1, 0.1, 0.1, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_inactive"]
-bg_color = Color(0.2, 0.2, 0.2, 0.7)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
-[sub_resource type="LabelSettings" id="LabelSettings_level_numeral_inactive"]
-font_size = 28
-font_color = Color(0.4, 0.4, 0.4, 1)
+[sub_resource type="LabelSettings" id="LabelSettings_bar_inactive"]
+font_size = 32
+font_color = Color(0.45, 0.45, 0.45, 0.7)
+outline_size = 1
+outline_color = Color(0, 0, 0, 0.3)
 
 [sub_resource type="Environment" id="Environment_p57ef"]
 background_mode = 3
@@ -83,7 +62,7 @@ script = ExtResource("1_uwrxv")
 sword_state_textures = Array[Texture2D]([ExtResource("2_iywne"), ExtResource("3_p57ef"), ExtResource("4_u5sy4"), ExtResource("5_gee14"), ExtResource("6_p57ef")])
 
 [node name="SwordDisplay" type="Sprite2D" parent="."]
-position = Vector2(150, 256)
+position = Vector2(150, 211)
 
 [node name="Track" type="ColorRect" parent="."]
 anchors_preset = -1
@@ -97,7 +76,7 @@ color = Color(0.207512, 0.207512, 0.207512, 1)
 position = Vector2(880, 490)
 
 [node name="TargetZone" type="Marker2D" parent="."]
-position = Vector2(228, 490)
+position = Vector2(232, 490)
 
 [node name="HintI" type="Label" parent="."]
 anchors_preset = -1
@@ -142,19 +121,20 @@ vertical_alignment = 1
 
 [node name="LoopTimeLabel" type="Label" parent="UI"]
 anchors_preset = -1
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 200.0
-offset_bottom = 50.0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -45.0
+offset_right = 311.0
+grow_vertical = 0
 text = "[DEBUG] Loop: 0.00s"
 label_settings = SubResource("LabelSettings_04n7w")
 
 [node name="ScoreLabel" type="Label" parent="UI"]
 anchors_preset = -1
 offset_left = 94.0
-offset_top = 85.0
+offset_top = 304.0
 offset_right = 215.0
-offset_bottom = 131.0
+offset_bottom = 350.0
 text = "0"
 label_settings = SubResource("LabelSettings_04n7w")
 horizontal_alignment = 1
@@ -181,82 +161,49 @@ offset_bottom = 72.0
 grow_horizontal = 0
 show_percentage = false
 
-[node name="TierDisplay" type="PanelContainer" parent="UI"]
+[node name="TierDisplay" type="VBoxContainer" parent="UI"]
 anchors_preset = -1
 anchor_left = 0.5
-anchor_top = 1.0
+anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -175.0
-offset_top = -120.0
-offset_right = 175.0
-offset_bottom = -30.0
+anchor_bottom = 0.5
+offset_left = -474.0
+offset_top = -251.5
+offset_right = -374.0
+offset_bottom = -190.5
 grow_horizontal = 2
-grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_main_tier_container")
+grow_vertical = 2
+alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/TierDisplay"]
-layout_mode = 2
-
-[node name="TierNameLabel" type="Label" parent="UI/TierDisplay/VBoxContainer"]
+[node name="TierNameLabel" type="Label" parent="UI/TierDisplay"]
 layout_mode = 2
 text = "SCRAP"
 label_settings = SubResource("LabelSettings_tier_name")
 horizontal_alignment = 1
 
-[node name="LevelSegmentsContainer" type="HBoxContainer" parent="UI/TierDisplay/VBoxContainer"]
+[node name="LevelBarsContainer" type="HBoxContainer" parent="UI/TierDisplay"]
 layout_mode = 2
-size_flags_vertical = 3
+theme_override_constants/separation = 4
 alignment = 1
 
-[node name="LevelSegment1" type="Panel" parent="UI/TierDisplay/VBoxContainer/LevelSegmentsContainer"]
-custom_minimum_size = Vector2(100, 40)
+[node name="LevelBar1" type="Label" parent="UI/TierDisplay/LevelBarsContainer"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_level_active")
-
-[node name="Numeral" type="Label" parent="UI/TierDisplay/VBoxContainer/LevelSegmentsContainer/LevelSegment1"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "I"
-label_settings = SubResource("LabelSettings_level_numeral_active")
+text = "|"
+label_settings = SubResource("LabelSettings_bar_active")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LevelSegment2" type="Panel" parent="UI/TierDisplay/VBoxContainer/LevelSegmentsContainer"]
-custom_minimum_size = Vector2(100, 40)
+[node name="LevelBar2" type="Label" parent="UI/TierDisplay/LevelBarsContainer"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_level_inactive")
-
-[node name="Numeral" type="Label" parent="UI/TierDisplay/VBoxContainer/LevelSegmentsContainer/LevelSegment2"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "II"
-label_settings = SubResource("LabelSettings_level_numeral_inactive")
+text = "|"
+label_settings = SubResource("LabelSettings_bar_inactive")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LevelSegment3" type="Panel" parent="UI/TierDisplay/VBoxContainer/LevelSegmentsContainer"]
-custom_minimum_size = Vector2(100, 40)
+[node name="LevelBar3" type="Label" parent="UI/TierDisplay/LevelBarsContainer"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_level_inactive")
-
-[node name="Numeral" type="Label" parent="UI/TierDisplay/VBoxContainer/LevelSegmentsContainer/LevelSegment3"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "III"
-label_settings = SubResource("LabelSettings_level_numeral_inactive")
+text = "|"
+label_settings = SubResource("LabelSettings_bar_inactive")
 horizontal_alignment = 1
 vertical_alignment = 1
 
