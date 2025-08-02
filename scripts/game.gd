@@ -205,10 +205,9 @@ func _process(delta):
 
 	if song_position >= 0:
 		loop_position = fmod(song_position, LOOP_DURATION)
-		if loop_position < last_loop_position:
-			_on_loop_tick()
+		# Check if we have just crossed the evaluation time for this loop
 		if last_loop_position < EVALUATION_TIME and loop_position >= EVALUATION_TIME:
-			_evaluate_performance()
+			_end_of_loop_procedure() # Call our new, combined function
 		last_loop_position = loop_position
 		loop_time_label.text = "[DEBUG] Loop: %.2fs" % loop_position
 	else:
@@ -220,35 +219,15 @@ func _process(delta):
 		set_fever_meter(fever_meter - fever_decay_rate * delta)
 
 
-func _on_loop_tick():
-	print("--- LOOP TICK --- Note Level: %d, Music Level: %d" % [next_level, active_music_level])
-	var loops_passed = floor(song_position / LOOP_DURATION)
-	current_loop_start_time = loops_passed * LOOP_DURATION
-
-	var old_level = current_level
-	current_level = next_level
-
-	if current_level > old_level:
-		is_awaiting_level_sync_hit = true
-		print("Awaiting player hit to sync music to level %d" % current_level)
-	else:
-		if active_music_level != current_level:
-			active_music_level = current_level
-			_update_music_volume()
-
-	current_loop_spawn_indices = next_loop_spawn_indices.duplicate(true)
-	next_loop_spawn_indices.clear()
-	_prepare_for_new_loop()
-
-
-func _evaluate_performance():
+func _end_of_loop_procedure():
+	# --- Part 1: Evaluate performance of the loop that just ended ---
 	var success_rate: float = 0.0
 	if notes_in_current_loop > 0:
 		success_rate = float(notes_hit_in_current_loop) / float(notes_in_current_loop)
 	else:
 		success_rate = 1.0
 
-	print("You missed %d notes" % (notes_in_current_loop - notes_hit_in_current_loop))
+	print("Loop Eval: %d / %d notes hit (%.0f%%)" % [notes_hit_in_current_loop, notes_in_current_loop, success_rate * 100])
 	var old_next_level = next_level
 	if success_rate >= 0.90:
 		next_level = min(current_level + 1, MAX_LEVEL)
@@ -268,12 +247,36 @@ func _evaluate_performance():
 	if next_level != old_next_level:
 		next_loop_spawn_indices.clear()
 
+	# --- Part 2: Immediately transition the game state to prepare for the *next* loop ---
+	print("--- Preparing for next loop. New Note Level: %d, Current Music Level: %d ---" % [next_level, active_music_level])
+
+	# Set the start time for the upcoming loop, which the spawner will use
+	var loops_passed = floor(song_position / LOOP_DURATION)
+	current_loop_start_time = (loops_passed + 1) * LOOP_DURATION
+
+	var old_level = current_level
+	current_level = next_level
+
+	if current_level > old_level:
+		is_awaiting_level_sync_hit = true
+		print("Awaiting player hit to sync music to level %d" % current_level)
+	else: # If we level down or stay, sync the music immediately
+		if active_music_level != current_level:
+			active_music_level = current_level
+			_update_music_volume()
+
+	# --- Part 3: Prepare counters and indices for the new loop ---
+	current_loop_spawn_indices = next_loop_spawn_indices.duplicate(true)
+	next_loop_spawn_indices.clear()
+
+	_prepare_for_new_loop() # This now just calculates total notes
+	notes_hit_in_current_loop = 0 # Reset hit counter for the new loop
+
 
 func _prepare_for_new_loop():
 	notes_in_current_loop = 0
 	for level_idx in range(current_level + 1):
 		notes_in_current_loop += all_charts.get(level_idx, []).size()
-	notes_hit_in_current_loop = 0
 
 
 func _spawn_notes_from_active_charts():

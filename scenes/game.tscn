@@ -151,10 +151,12 @@ stream = ExtResource("7_gee14")
 
 [node name="MusicLayer2" type="AudioStreamPlayer" parent="MusicLayers"]
 stream = ExtResource("8_0tnpc")
-pitch_scale = 0.5
+volume_db = 11.093
 
 [node name="MusicLayer3" type="AudioStreamPlayer" parent="MusicLayers"]
 stream = ExtResource("8_0tnpc")
+volume_db = 24.0
+pitch_scale = 0.5
 
 [node name="SFX" type="Node" parent="."]
 
