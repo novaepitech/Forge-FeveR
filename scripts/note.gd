@@ -10,7 +10,6 @@ var spawn_position: Vector2
 var target_position: Vector2
 var track_id: int = 0
 
-# --- Cahier des Charges 2.B Addition ---
 # Flag to identify special notes for scoring and visual feedback.
 var is_empowered: bool = false
 

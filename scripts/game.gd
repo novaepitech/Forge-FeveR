@@ -35,12 +35,26 @@ const EMPOWERED_CHANCE_OLD: float = 0.07   # 7% chance for notes of previous lev
 const FEVER_METER_MIN: float = 0.0
 const FEVER_METER_MAX: float = 100.0
 
-@export_group("Sword Progression")
-@export var sword_score_thresholds: Array[int] = [65000, 150000, 450000, 800000]
+@export_group("Progression System")
 @export var sword_state_textures: Array[Texture2D]
-
-@export_group("Checkpoints")
-@export var score_checkpoints: Array[int] = [100000, 600000, 800000]
+@export var progression_data: Array[Dictionary] = [
+	{
+		"name": "SCRAP",
+		"levels": [
+			{"score_threshold": 0, "texture_index": 0},      # Niveau I
+			{"score_threshold": 65000, "texture_index": 1},  # Niveau II
+			{"score_threshold": 150000, "texture_index": 2}   # Niveau III
+		]
+	},
+	{
+		"name": "IRON",
+		"levels": [
+			{"score_threshold": 450000, "texture_index": 3},  # Niveau I
+			{"score_threshold": 900000, "texture_index": 3},  # Niveau II
+			{"score_threshold": 1600000, "texture_index": 4}  # Niveau III
+		]
+	}
+]
 
 var all_charts: Dictionary = {
 	0: [
@@ -85,10 +99,12 @@ var active_notes: Array[Node] = []
 var total_score: int = 0
 var score_multiplier: int = 1
 var fever_meter: float = 0.0
-var current_sword_state_index: int = 0
-var highest_checkpoint_reached: int = 0
 var consecutive_misses: int = 0
 var base_miss_penalty: int = 500
+
+var current_tier_index: int = 0
+var current_level_index: int = 0
+var highest_tier_checkpoint_index: int = 0
 
 # --- Loop State ---
 var loop_position: float = 0.0
@@ -106,6 +122,12 @@ var music_started: bool = false
 var active_music_level: int = 0
 var is_awaiting_level_sync_hit: bool = false
 
+# --- UI Styles Variables ---
+var _style_level_active: StyleBox
+var _style_level_inactive: StyleBox
+var _settings_numeral_active: LabelSettings
+var _settings_numeral_inactive: LabelSettings
+
 # --- Node References ---
 @onready var spawn_pos_marker: Marker2D = $SpawnPoint
 @onready var target_pos_marker: Marker2D = $TargetZone
@@ -116,6 +138,12 @@ var is_awaiting_level_sync_hit: bool = false
 @onready var loop_time_label: Label = $UI/LoopTimeLabel
 @onready var transition_feedback_label: Label = $UI/TransitionFeedbackLabel
 @onready var transition_feedback_timer: Timer = $TransitionFeedbackTimer
+@onready var tier_name_label: Label = $UI/TierDisplay/VBoxContainer/TierNameLabel
+@onready var level_segments: Array[Panel] = [
+	$UI/TierDisplay/VBoxContainer/LevelSegmentsContainer/LevelSegment1,
+	$UI/TierDisplay/VBoxContainer/LevelSegmentsContainer/LevelSegment2,
+	$UI/TierDisplay/VBoxContainer/LevelSegmentsContainer/LevelSegment3
+]
 
 # --- Audio Node References ---
 @onready var music_layers: Dictionary = {
@@ -132,8 +160,21 @@ var is_awaiting_level_sync_hit: bool = false
 
 func _ready():
 	MAX_LEVEL = all_charts.keys().max()
+
+	# Retrieve styles from pre-configured nodes
+	_capture_ui_styles()
+
 	reset_game_state()
 	_initialize_audio()
+
+
+func _capture_ui_styles():
+	# Using generic get() method to retrieve an override property,
+	# which is a robust solution to avoid issues with preload().
+	_style_level_active = level_segments[0].get("theme_override_styles/panel")
+	_style_level_inactive = level_segments[1].get("theme_override_styles/panel")
+	_settings_numeral_active = level_segments[0].get_node("Numeral").label_settings
+	_settings_numeral_inactive = level_segments[1].get_node("Numeral").label_settings
 
 
 func reset_game_state():
@@ -148,7 +189,11 @@ func reset_game_state():
 	score_multiplier = 1
 	set_fever_meter(FEVER_METER_MIN)
 	consecutive_misses = 0
-	highest_checkpoint_reached = 0
+
+	current_tier_index = 0
+	current_level_index = 0
+	highest_tier_checkpoint_index = 0
+
 	song_position = -initial_delay
 
 	for note in active_notes:
@@ -165,13 +210,10 @@ func reset_game_state():
 
 	_prepare_for_new_loop()
 
-	current_sword_state_index = 0
 	if is_instance_valid(sword_display):
 		sword_display.visible = true
-		if not sword_state_textures.is_empty() and sword_state_textures[0]:
-			sword_display.texture = sword_state_textures[0]
-		else:
-			sword_display.visible = false
+	_update_progression() # Initializes progression state
+
 	_update_ui()
 
 	if is_node_ready():
@@ -401,13 +443,9 @@ func _on_note_judged(judgment: String, track_id: int, score_change: int, is_empo
 		final_score_change = score_change * score_multiplier
 
 	total_score += final_score_change
-	if final_score_change > 0:
-		for checkpoint_score in score_checkpoints:
-			if total_score >= checkpoint_score and checkpoint_score > highest_checkpoint_reached:
-				highest_checkpoint_reached = checkpoint_score
 
-	total_score = max(total_score, highest_checkpoint_reached)
-	_update_sword_visual()
+	_update_progression()
+
 	_update_ui()
 
 
@@ -419,16 +457,80 @@ func calculate_miss_penalty() -> int:
 	if consecutive_misses == 0: return base_miss_penalty
 	return base_miss_penalty * (2 ** (consecutive_misses - 1))
 
-func _update_sword_visual():
-	var required_state_index = 0
-	for i in range(sword_score_thresholds.size()):
-		if total_score >= sword_score_thresholds[i]: required_state_index = i + 1
-		else: break
-	if required_state_index != current_sword_state_index:
-		current_sword_state_index = required_state_index
-		if is_instance_valid(sword_display) and sword_state_textures.size() > current_sword_state_index:
-			var new_texture = sword_state_textures[current_sword_state_index]
-			if new_texture: sword_display.texture = new_texture
+# Central Progression Logic Function
+func _update_progression():
+	# --- 1. Find the current tier and level based on score ---
+	var potential_tier_idx = 0
+	var potential_level_idx = 0
+	for i in range(progression_data.size() - 1, -1, -1):
+		var tier = progression_data[i]
+		var levels = tier["levels"]
+		for j in range(levels.size() - 1, -1, -1):
+			if total_score >= levels[j]["score_threshold"]:
+				potential_tier_idx = i
+				potential_level_idx = j
+				# Exit both loops once the correct level is found
+				i = -1
+				break
+
+	# --- 2. Apply checkpoint rules ---
+	# Rule #2 (Visual Floor): Cannot drop below the highest checkpoint tier reached.
+	var final_tier_idx = max(potential_tier_idx, highest_tier_checkpoint_index)
+	var final_level_idx = potential_level_idx
+	# If forced back to a higher tier due to checkpoint,
+	# set to the lowest level of that tier.
+	if final_tier_idx > potential_tier_idx:
+		final_level_idx = 0
+
+	# --- 3. Detect reaching a new checkpoint tier ---
+	if final_tier_idx > highest_tier_checkpoint_index:
+		highest_tier_checkpoint_index = final_tier_idx
+		print("CHECKPOINT REACHED: Tier %s" % progression_data[highest_tier_checkpoint_index]["name"])
+		# TODO: Potentially play a sound / special effect here
+
+	# --- 4. Update game state ---
+	current_tier_index = final_tier_idx
+	current_level_index = final_level_idx
+
+	# --- 5. Apply Rule #1 (Score Floor) ---
+	var checkpoint_score_floor = progression_data[highest_tier_checkpoint_index]["levels"][0]["score_threshold"]
+	total_score = max(total_score, checkpoint_score_floor)
+
+	# --- 6. Update visuals ---
+	_update_sword_texture()
+	_update_tier_ui()
+
+
+func _update_sword_texture():
+	if not is_instance_valid(sword_display) or progression_data.is_empty():
+		return
+
+	var tier_data = progression_data[current_tier_index]
+	var level_data = tier_data["levels"][current_level_index]
+	var texture_idx = level_data["texture_index"]
+
+	if sword_state_textures.size() > texture_idx:
+		var new_texture = sword_state_textures[texture_idx]
+		if new_texture and sword_display.texture != new_texture:
+			sword_display.texture = new_texture
+
+func _update_tier_ui():
+	if not is_instance_valid(tier_name_label): return
+
+	var tier_data = progression_data[current_tier_index]
+	tier_name_label.text = tier_data["name"]
+
+	for i in range(level_segments.size()):
+		var segment_panel = level_segments[i]
+		var numeral_label = segment_panel.get_node("Numeral")
+
+		if i == current_level_index:
+			segment_panel.add_theme_stylebox_override("panel", _style_level_active)
+			numeral_label.label_settings = _settings_numeral_active
+		else:
+			segment_panel.add_theme_stylebox_override("panel", _style_level_inactive)
+			numeral_label.label_settings = _settings_numeral_inactive
+
 
 func _update_multiplier():
 	if fever_meter >= 95.0: score_multiplier = 32

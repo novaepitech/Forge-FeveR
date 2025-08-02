@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://b3pm2nt526yr7"]
+[gd_scene load_steps=24 format=3 uid="uid://b3pm2nt526yr7"]
 
 [ext_resource type="Script" uid="uid://bh6srqu5h8vbj" path="res://scripts/game.gd" id="1_uwrxv"]
 [ext_resource type="Texture2D" uid="uid://pdscnrc6xxkt" path="res://assets/sprites/swords/sword_level_0.webp" id="2_iywne"]
@@ -33,6 +33,46 @@ font_color = Color(1, 1, 1, 0.8)
 [sub_resource type="LabelSettings" id="LabelSettings_04n7w"]
 font_size = 32
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_main_tier_container"]
+bg_color = Color(0.05, 0.05, 0.05, 0.8)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.15, 0.15, 0.15, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="LabelSettings" id="LabelSettings_tier_name"]
+font_size = 20
+font_color = Color(0.8, 0.7, 0.6, 1)
+outline_size = 2
+outline_color = Color(0, 0, 0, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_active"]
+bg_color = Color(1, 0.75, 0, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="LabelSettings" id="LabelSettings_level_numeral_active"]
+font_size = 28
+font_color = Color(0.1, 0.1, 0.1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_inactive"]
+bg_color = Color(0.2, 0.2, 0.2, 0.7)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="LabelSettings" id="LabelSettings_level_numeral_inactive"]
+font_size = 28
+font_color = Color(0.4, 0.4, 0.4, 1)
+
 [sub_resource type="Environment" id="Environment_p57ef"]
 background_mode = 3
 glow_enabled = true
@@ -47,23 +87,23 @@ position = Vector2(150, 256)
 
 [node name="Track" type="ColorRect" parent="."]
 anchors_preset = -1
-offset_left = 232.0
+offset_left = 493.0
 offset_top = 403.0
-offset_right = 880.0
+offset_right = 1141.0
 offset_bottom = 577.0
 color = Color(0.207512, 0.207512, 0.207512, 1)
 
 [node name="SpawnPoint" type="Marker2D" parent="."]
-position = Vector2(880, 490)
+position = Vector2(1141, 490)
 
 [node name="TargetZone" type="Marker2D" parent="."]
-position = Vector2(228, 490)
+position = Vector2(489, 490)
 
 [node name="HintI" type="Label" parent="."]
 anchors_preset = -1
-offset_left = 208.0
+offset_left = 469.0
 offset_top = 416.0
-offset_right = 258.0
+offset_right = 519.0
 offset_bottom = 466.0
 theme_override_font_sizes/font_size = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_h2q0q")
@@ -74,9 +114,9 @@ vertical_alignment = 1
 
 [node name="HintJ" type="Label" parent="."]
 anchors_preset = -1
-offset_left = 208.0
+offset_left = 469.0
 offset_top = 466.0
-offset_right = 258.0
+offset_right = 519.0
 offset_bottom = 516.0
 theme_override_font_sizes/font_size = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_h2q0q")
@@ -87,9 +127,9 @@ vertical_alignment = 1
 
 [node name="HintN" type="Label" parent="."]
 anchors_preset = -1
-offset_left = 208.0
+offset_left = 469.0
 offset_top = 516.0
-offset_right = 258.0
+offset_right = 519.0
 offset_bottom = 566.0
 theme_override_font_sizes/font_size = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_h2q0q")
@@ -140,6 +180,85 @@ offset_right = -45.0
 offset_bottom = 72.0
 grow_horizontal = 0
 show_percentage = false
+
+[node name="TierDisplay" type="PanelContainer" parent="UI"]
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -534.0
+offset_top = -193.0
+offset_right = -184.0
+offset_bottom = -103.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_main_tier_container")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/TierDisplay"]
+layout_mode = 2
+
+[node name="TierNameLabel" type="Label" parent="UI/TierDisplay/VBoxContainer"]
+layout_mode = 2
+text = "SCRAP"
+label_settings = SubResource("LabelSettings_tier_name")
+horizontal_alignment = 1
+
+[node name="LevelSegmentsContainer" type="HBoxContainer" parent="UI/TierDisplay/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+
+[node name="LevelSegment1" type="Panel" parent="UI/TierDisplay/VBoxContainer/LevelSegmentsContainer"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_level_active")
+
+[node name="Numeral" type="Label" parent="UI/TierDisplay/VBoxContainer/LevelSegmentsContainer/LevelSegment1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "I"
+label_settings = SubResource("LabelSettings_level_numeral_active")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LevelSegment2" type="Panel" parent="UI/TierDisplay/VBoxContainer/LevelSegmentsContainer"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_level_inactive")
+
+[node name="Numeral" type="Label" parent="UI/TierDisplay/VBoxContainer/LevelSegmentsContainer/LevelSegment2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "II"
+label_settings = SubResource("LabelSettings_level_numeral_inactive")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LevelSegment3" type="Panel" parent="UI/TierDisplay/VBoxContainer/LevelSegmentsContainer"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_level_inactive")
+
+[node name="Numeral" type="Label" parent="UI/TierDisplay/VBoxContainer/LevelSegmentsContainer/LevelSegment3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "III"
+label_settings = SubResource("LabelSettings_level_numeral_inactive")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="TransitionFeedbackLabel" type="Label" parent="UI"]
 visible = false
