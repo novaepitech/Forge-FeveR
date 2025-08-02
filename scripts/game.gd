@@ -12,8 +12,8 @@ const VOLUME_AUDIBLE_DB: float = 0.0
 const VOLUME_MUTED_DB: float = -80.0
 
 # --- Loop & Chart Parameters ---
-const LOOP_DURATION: float = 20.0
-const EVALUATION_TIME: float = 17.0
+const LOOP_DURATION: float = 24.0
+const EVALUATION_TIME: float = 21.0
 
 @export_group("Timing Windows")
 @export var timing_window_perfect: float = 0.04

@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://coqrcxpsgupww" path="res://assets/sprites/swords/sword_level_3.webp" id="5_gee14"]
 [ext_resource type="Texture2D" uid="uid://6vb5rv88veow" path="res://assets/sprites/swords/sword_level_4.webp" id="6_p57ef"]
 [ext_resource type="AudioStream" uid="uid://di1w5iy6cbu8o" path="res://assets/musics/base.mp3" id="7_gee14"]
-[ext_resource type="AudioStream" uid="uid://cbjex6cmtwjjt" path="res://assets/sounds/level_1.mp3" id="8_0tnpc"]
+[ext_resource type="AudioStream" uid="uid://cbjex6cmtwjjt" path="res://assets/musics/level_1.mp3" id="8_0tnpc"]
 [ext_resource type="AudioStream" uid="uid://cnw7vabx6gcb2" path="res://assets/sounds/perfect.mp3" id="9_kvuet"]
 [ext_resource type="AudioStream" uid="uid://bqw1wfhtkablf" path="res://assets/sounds/imperfect.mp3" id="10_trtic"]
 [ext_resource type="AudioStream" uid="uid://crkw3aqfafr2a" path="res://assets/sounds/miss.mp3" id="11_ir15t"]

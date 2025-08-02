@@ -24,19 +24,19 @@
 
 #### **2.1. Structure du Jeu & Flux de la Boucle Continue**
 
-Le jeu n'est pas une succession de niveaux, mais un flux continu et ininterrompu basé sur une boucle de 20 secondes. La transition entre les niveaux de difficulté est intégrée dans le gameplay sans aucun temps mort.
+Le jeu n'est pas une succession de niveaux, mais un flux continu et ininterrompu basé sur une boucle de 24 secondes. La transition entre les niveaux de difficulté est intégrée dans le gameplay sans aucun temps mort.
 
 - **Démarrage du jeu :**
     - Un métronome sonore se lance pour donner le tempo au joueur.
     - La première note est validée par le joueur, ce qui **déclenche** la musique de base du Niveau 1, créant un sentiment de puissance et d'agence.
 
-- **Chronologie d'une Boucle de Transition (ex: 20 secondes) :**
-    - **Phase 1 - Performance (`0s` à `17s`) :** Le joueur joue la séquence de notes du niveau actuel. La musique du niveau actuel est jouée.
-    - **Phase 2 - Évaluation (`17s` à `18s`) :** Après la dernière note, le jeu calcule instantanément la performance. Le feedback visuel et sonore ("LEVEL UP!", "STAY", "LEVEL DOWN") est donné au joueur. La musique actuelle continue de jouer.
-    - **Phase 3 - Anticipation Visuelle (`18s` à `20s`) :** **C'est le cœur du défi.** Les notes du **prochain** niveau de difficulté commencent à apparaître, se déplaçant vers la zone de validation. Le joueur doit les lire et anticiper leur rythme tout en entendant la fin de la musique du niveau précédent.
-    - **Phase 4 - Déclenchement (`20s`) :** Au moment exact où la boucle recommence, le joueur doit frapper la première note de la nouvelle séquence. Cette action **déclenche** l'ajout (ou le retrait) des couches musicales correspondant au nouveau niveau de difficulté. L'enchaînement est parfait et l'action ne s'arrête jamais.
+- **Chronologie d'une Boucle de Transition (ex: 24 secondes) :**
+    - **Phase 1 - Performance (`0s` à `21s`) :** Le joueur joue la séquence de notes du niveau actuel. La musique du niveau actuel est jouée.
+    - **Phase 2 - Évaluation (`21s` à `22s`) :** Après la dernière note, le jeu calcule instantanément la performance. Le feedback visuel et sonore ("LEVEL UP!", "STAY", "LEVEL DOWN") est donné au joueur. La musique actuelle continue de jouer.
+    - **Phase 3 - Anticipation Visuelle (`22s` à `24s`) :** **C'est le cœur du défi.** Les notes du **prochain** niveau de difficulté commencent à apparaître, se déplaçant vers la zone de validation. Le joueur doit les lire et anticiper leur rythme tout en entendant la fin de la musique du niveau précédent.
+    - **Phase 4 - Déclenchement (`24s`) :** Au moment exact où la boucle recommence, le joueur doit frapper la première note de la nouvelle séquence. Cette action **déclenche** l'ajout (ou le retrait) des couches musicales correspondant au nouveau niveau de difficulté. L'enchaînement est parfait et l'action ne s'arrête jamais.
 
-- **Règles de Transition (appliquées à `17s`) :**
+- **Règles de Transition (appliquées à `21s`) :**
     - **Promotion (Level Up) :** **100% de notes réussies.** Le joueur affrontera le niveau supérieur.
     - **Stagnation (Stay) :** **Entre 80% et 99% de notes réussies.** Le joueur rejouera le même niveau.
     - **Régression (Level Down) :** **Moins de 80% de notes réussies.** Le joueur est renvoyé au niveau précédent (minimum Niveau 1).
@@ -109,12 +109,12 @@ Le jeu n'est pas une succession de niveaux, mais un flux continu et ininterrompu
 
 ### **4. Données du Jeu**
 
-- **Chart Data :** Un `chart` par niveau de difficulté. Chaque chart est conçu pour s'intégrer dans la boucle de 20 secondes, avec des notes s'arrêtant avant la fin pour permettre la phase d'anticipation.
+- **Chart Data :** Un `chart` par niveau de difficulté. Chaque chart est conçu pour s'intégrer dans la boucle de 24 secondes, avec des notes s'arrêtant avant la fin pour permettre la phase d'anticipation.
 - **Génération dynamique :** Le statut "Empowered" est assigné via l'algorithme hybride.
 
 ### **5. Scope pour la Game Jam (MVP - v1.4)**
 
-- Mise en place de la boucle de jeu **continue** de 20 secondes avec au moins 3 niveaux de difficulté.
+- Mise en place de la boucle de jeu **continue** de 24 secondes avec au moins 3 niveaux de difficulté.
 - Construction de l'UI de jeu respectant la maquette.
 - Mise en place de la logique de jeu à 3 pistes.
 - Implémentation du système de progression dynamique (promotion, stagnation, régression) et du **flux de transition sans interruption**.
