@@ -1,4 +1,3 @@
-# Forge FeveR/scripts/note.gd (MIS À JOUR)
 extends Area2D
 
 signal missed
