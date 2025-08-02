@@ -7,7 +7,7 @@ const NoteScene = preload("res://scenes/note.tscn")
 @export var lookahead_time: float = 2.0
 @export var track_y_positions: Array[float] = [460.0, 490.0, 520.0]
 
-# --- Audio Parameters (NOUVEAU) ---
+# --- Audio Parameters ---
 const VOLUME_AUDIBLE_DB: float = 0.0
 const VOLUME_MUTED_DB: float = -80.0
 
@@ -63,6 +63,10 @@ var notes_hit_in_current_loop: int = 0
 var current_level_spawn_idx: int = 0
 var next_level_spawn_idx: int = 0
 
+# --- State Variables for Music Start ---
+var music_started: bool = false
+var first_note_hit_time: float
+
 # --- Node References ---
 @onready var spawn_pos_marker: Marker2D = $SpawnPoint
 @onready var target_pos_marker: Marker2D = $TargetZone
@@ -71,7 +75,7 @@ var next_level_spawn_idx: int = 0
 @onready var fever_meter_bar: ProgressBar = $UI/FeverMeterBar
 @onready var sword_display: Sprite2D = $SwordDisplay
 
-# --- Audio Node References (NOUVEAU) ---
+# --- Audio Node References ---
 @onready var music_layers: Dictionary = {
 	1: $MusicLayers/MusicLayer1,
 	2: $MusicLayers/MusicLayer2,
@@ -84,12 +88,24 @@ var next_level_spawn_idx: int = 0
 @onready var sfx_level_down: AudioStreamPlayer = $SFX/SfxLevelDown
 
 func _ready():
+	# Déterminer le temps de la première note pour synchroniser le début de la musique.
+	if all_charts.has(1) and not all_charts[1].is_empty():
+		first_note_hit_time = all_charts[1][0].time
+	else:
+		# Fallback si le chart 1 est vide ou manquant.
+		first_note_hit_time = 2.0
+
 	MAX_LEVEL = all_charts.size()
 	note_judged.connect(_on_note_judged)
 	reset_game_state()
-	_initialize_audio() # (NOUVEAU) Lancement de la musique
+	_initialize_audio() # Prépare les lecteurs audio, mais ne lance pas la musique.
 
 func reset_game_state():
+	if is_node_ready():
+		for player in music_layers.values():
+			player.stop()
+	music_started = false # Réinitialiser le drapeau pour le prochain départ.
+
 	total_score = 0
 	score_multiplier = 1
 	set_fever_meter(FEVER_METER_MIN)
@@ -120,19 +136,25 @@ func reset_game_state():
 			sword_display.visible = false
 	_update_ui()
 
-	# (NOUVEAU) S'assurer que la musique est correcte au reset
 	if is_node_ready():
 		_update_music_volume()
 
 
-# --- Audio Management Functions (NOUVEAU) ---
+# --- Audio Management Functions ---
 func _initialize_audio():
-	# Lance la lecture de toutes les couches musicales simultanément, mais en mode silencieux.
+	# Prépare les lecteurs audio sans les démarrer.
+	# La musique ne commencera que lorsque la première note atteindra la zone de frappe.
 	for level in music_layers:
 		var player = music_layers[level]
 		player.volume_db = VOLUME_MUTED_DB
+
+func _start_music():
+	music_started = true
+	# Lance la lecture de toutes les couches musicales simultanément, en les synchronisant.
+	for player in music_layers.values():
+		# On utilise song_position pour démarrer la lecture exactement au bon endroit du fichier audio.
 		player.play()
-	# Rend la première couche audible.
+	# Une fois que la musique joue, on règle les volumes corrects pour le niveau de départ.
 	_update_music_volume()
 
 func _update_music_volume():
@@ -148,6 +170,12 @@ func _update_music_volume():
 # --- Main Game Loop ---
 func _process(delta):
 	song_position += delta
+
+	# Déclencheur pour démarrer la musique.
+	# Cela ne se produit qu'une seule fois par partie.
+	if not music_started and song_position >= first_note_hit_time:
+		_start_music()
+
 	loop_position = fmod(song_position, LOOP_DURATION)
 
 	if loop_position < last_loop_position:
@@ -170,7 +198,6 @@ func _on_loop_tick():
 	var old_level = current_level
 	current_level = next_level
 
-	# (MODIFIÉ) Met à jour la musique si le niveau a changé
 	if old_level != current_level:
 		_update_music_volume()
 
@@ -184,7 +211,6 @@ func _evaluate_performance():
 	else:
 		success_rate = 1.0
 
-	# (MODIFIÉ) Sauvegarde de l'ancien niveau pour la détection de changement
 	var old_next_level = next_level
 
 	if success_rate >= 1.0:
@@ -197,7 +223,6 @@ func _evaluate_performance():
 		next_level = max(current_level - 1, 1)
 		print("EVAL: LEVEL DOWN! (%.0f%%)" % (success_rate * 100))
 
-	# (NOUVEAU) Déclenchement du SFX de transition de niveau
 	if next_level > current_level:
 		sfx_level_up.play()
 	elif next_level < current_level:
@@ -277,7 +302,6 @@ func _on_note_missed(note_missed: Node):
 	if active_notes.has(note_missed):
 		active_notes.erase(note_missed)
 
-# (MODIFIÉ) Ajout des déclenchements de SFX pour les jugements
 func _on_note_judged(judgment: String):
 	match judgment:
 		"Perfect":
