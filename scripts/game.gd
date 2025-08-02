@@ -37,8 +37,9 @@ const FEVER_METER_MAX: float = 100.0
 const SUPERNOVA_THRESHOLD: float = 95.0
 
 @export_group("Feedback Settings")
-@export var shake_strength_perfect: float = 4.0
-@export var shake_strength_empowered: float = 8.0
+@export var shake_strength_perfect_base: float = 10.0
+@export var shake_strength_perfect_increment: float = 1.0
+@export var shake_strength_perfect_max: float = 20.0
 @export var shake_fade: float = 10.0
 
 @export_group("Progression System")
@@ -77,6 +78,7 @@ var total_score: int = 0
 var score_multiplier: int = 1
 var fever_meter: float = 0.0
 var consecutive_misses: int = 0
+var consecutive_perfects: int = 0
 var base_miss_penalty: int = 500
 
 var current_tier_index: int = 0
@@ -167,6 +169,7 @@ func reset_game_state():
 	score_multiplier = 1
 	set_fever_meter(FEVER_METER_MIN, false)
 	consecutive_misses = 0
+	consecutive_perfects = 0
 
 	current_tier_index = 0
 	current_level_index = 0
@@ -404,17 +407,20 @@ func _process_judgment(judgment: String, note: Node, miss_track_id: int = -1):
 	match judgment:
 		"Perfect":
 			notes_hit_in_current_loop += 1
+			consecutive_perfects += 1
 			set_fever_meter(fever_meter + fever_gain_perfect, true)
 			consecutive_misses = 0
 			sfx_perfect.play()
 			if is_awaiting_level_sync_hit: _sync_music_on_hit()
 		"Good", "OK":
 			notes_hit_in_current_loop += 1
+			consecutive_perfects = 0
 			set_fever_meter(fever_meter - fever_penalty_imperfect, false)
 			consecutive_misses = 0
 			sfx_imperfect.play()
 			if is_awaiting_level_sync_hit: _sync_music_on_hit()
 		"Miss":
+			consecutive_perfects = 0
 			set_fever_meter(FEVER_METER_MIN, true)
 			consecutive_misses += 1
 			score_multiplier = 1
@@ -472,8 +478,18 @@ func _trigger_score_popup(judgment: String, pos: Vector2, score: int, is_empower
 
 func _trigger_camera_shake(judgment: String, is_empowered_perfect: bool):
 	if judgment != "Perfect": return
-	var strength = shake_strength_empowered if is_empowered_perfect else shake_strength_perfect
-	# Set shake strength. Using max prevents a stronger shake from being overridden by a weaker one.
+
+	# Calcule la force du shake pour un "perfect" en fonction du combo consécutif.
+	# Le combo commence à 1, donc (consecutive_perfects - 1) donne le nombre d'incréments.
+	var current_perfect_shake = shake_strength_perfect_base + ((consecutive_perfects - 1) * shake_strength_perfect_increment)
+	current_perfect_shake = min(current_perfect_shake, shake_strength_perfect_max)
+
+	# Les "empowered perfects" ont une force doublée par rapport à la valeur actuelle du shake.
+	var strength = current_perfect_shake
+	if is_empowered_perfect:
+		strength *= 2.0
+
+	# Applique la force du shake. Utiliser max() évite qu'un shake plus fort soit écrasé par un plus faible.
 	shake_strength = max(shake_strength, strength)
 
 func _trigger_target_flash(judgment: String, track_id: int):
