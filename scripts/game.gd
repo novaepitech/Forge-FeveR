@@ -6,6 +6,7 @@ signal note_judged(judgment: String, track_id: int, score_change: int, is_empowe
 const NoteScene = preload("res://scenes/note.tscn")
 @export var lookahead_time: float = 2.0
 @export var track_y_positions: Array[float] = [440.0, 490.0, 540.0]
+@export var initial_delay: float = 2.0
 
 # --- Audio Parameters ---
 const VOLUME_AUDIBLE_DB: float = 0.0
@@ -35,29 +36,25 @@ const FEVER_METER_MAX: float = 100.0
 @export_group("Checkpoints")
 @export var score_checkpoints: Array[int] = [100000, 600000, 800000]
 
-# The game will combine charts from level 0 up to the current level.
-# Charts are timed for 160 BPM (0.375s per beat, 1.5s per 4/4 measure).
 var all_charts: Dictionary = {
-	# Level 0 (Easiest: One note every two measures, on the downbeat)
 	0: [
-		{"time": 2.0, "track": 1},
-		{"time": 5.0, "track": 2},
-		{"time": 8.0, "track": 1},
-		{"time": 11.0, "track": 2},
-		{"time": 14.0, "track": 1},
-		{"time": 17.0, "track": 2},
+		{"time": 0.0, "track": 1},
+		{"time": 3.0, "track": 2},
+		{"time": 6.0, "track": 1},
+		{"time": 9.0, "track": 2},
+		{"time": 12.0, "track": 1},
+		{"time": 15.0, "track": 2},
+		{"time": 17.0, "track": 3},
 		{"time": 19.0, "track": 2}
 	],
-	# Level 1 (Fills in the other downbeats for a one-note-per-measure feel)
 	1: [
-		{"time": 0, "track": 3}, # Since the level zero had to start at 2.0 for a "grace period"
+		{"time": 3.5, "track": 3},
 		{"time": 6.5, "track": 1},
 		{"time": 9.5, "track": 3},
 		{"time": 12.5, "track": 1},
 		{"time": 15.5, "track": 3},
 		{"time": 18.5, "track": 1}
 	],
-	# Level 2 (Adds notes on the 3rd beat of each measure - a simple quarter-note pulse)
 	2: [
 		{"time": 2.75, "track": 2},
 		{"time": 5.75, "track": 1},
@@ -66,14 +63,13 @@ var all_charts: Dictionary = {
 		{"time": 14.75, "track": 2},
 		{"time": 17.75, "track": 3}
 	],
-	# Level 3 (Adds a few extra quarter notes and two simple eighth-note flourishes)
 	3: [
-		{"time": 4.25, "track": 2},  # Quarter note
-		{"time": 5.375, "track": 1}, # Eighth note after 5.0 note
-		{"time": 10.25, "track": 2}, # Quarter note
-		{"time": 14.375, "track": 1},# Eighth note after 14.0 note
-		{"time": 16.25, "track": 3}, # Quarter note
-		{"time": 19.25, "track": 2}  # Quarter note
+		{"time": 4.25, "track": 2},
+		{"time": 5.375, "track": 1},
+		{"time": 10.25, "track": 2},
+		{"time": 14.375, "track": 1},
+		{"time": 16.25, "track": 3},
+		{"time": 19.25, "track": 2}
 	]
 }
 
@@ -94,7 +90,7 @@ const EMPOWERED_BONUS = 1500
 var loop_position: float = 0.0
 var last_loop_position: float = 0.0
 var current_loop_start_time: float = 0.0
-var current_level: int = 0 # Difficulty of notes being played
+var current_level: int = 0
 var next_level: int = 0
 var notes_in_current_loop: int = 0
 var notes_hit_in_current_loop: int = 0
@@ -103,8 +99,8 @@ var next_loop_spawn_indices: Dictionary = {}
 
 # --- State Variables for Music Start & Sync ---
 var music_started: bool = false
-var active_music_level: int = 0 # Which music layers are audible
-var is_awaiting_level_sync_hit: bool = false # Flag for pending music level-up
+var active_music_level: int = 0
+var is_awaiting_level_sync_hit: bool = false
 
 # --- Node References ---
 @onready var spawn_pos_marker: Marker2D = $SpawnPoint
@@ -116,9 +112,9 @@ var is_awaiting_level_sync_hit: bool = false # Flag for pending music level-up
 
 # --- Audio Node References ---
 @onready var music_layers: Dictionary = {
-	0: $MusicLayers/MusicLayer1, # Base track
-	1: $MusicLayers/MusicLayer2, # First additional layer
-	2: $MusicLayers/MusicLayer3  # Second additional layer
+	0: $MusicLayers/MusicLayer1,
+	1: $MusicLayers/MusicLayer2,
+	2: $MusicLayers/MusicLayer3
 }
 @onready var sfx_perfect: AudioStreamPlayer = $SFX/SfxPerfect
 @onready var sfx_imperfect: AudioStreamPlayer = $SFX/SfxImperfect
@@ -147,14 +143,14 @@ func reset_game_state():
 	set_fever_meter(FEVER_METER_MIN)
 	consecutive_misses = 0
 	highest_checkpoint_reached = 0
-	song_position = 0.0
+	song_position = -initial_delay
 
 	for note in active_notes:
 		if is_instance_valid(note): note.queue_free()
 	active_notes.clear()
 
 	loop_position = 0.0
-	last_loop_position = 0.0
+	last_loop_position = fmod(-initial_delay, LOOP_DURATION)
 	current_loop_start_time = 0.0
 	current_level = 0
 	next_level = 0
@@ -176,32 +172,23 @@ func reset_game_state():
 		_update_music_volume()
 
 
-# --- Audio Management Functions ---
 func _initialize_audio():
 	for level in music_layers:
 		music_layers[level].volume_db = VOLUME_MUTED_DB
 
 
-func _trigger_forge_start(note_target_time: float):
+func _start_music():
 	music_started = true
-	print("FORGE START! Music triggered by player. Resyncing clock.")
-
+	print("MUSIC START! Loop begins.")
 	for player in music_layers.values():
-		player.play()
-
-	song_position = note_target_time
-
-	# The initial music level is set here.
-	active_music_level = current_level
+		player.play(0.0)
+	active_music_level = 0
 	_update_music_volume()
 
 
-# --- MODIFIED: Uses active_music_level instead of current_level ---
 func _update_music_volume():
 	if not music_started:
 		return
-
-	# The audible music is now controlled by its own state variable.
 	for level in music_layers:
 		var player = music_layers[level]
 		if level <= active_music_level:
@@ -210,27 +197,29 @@ func _update_music_volume():
 			player.volume_db = VOLUME_MUTED_DB
 
 
-# --- Main Game Loop ---
 func _process(delta):
 	song_position += delta
-	loop_position = fmod(song_position, LOOP_DURATION)
 
-	if loop_position < last_loop_position:
-		_on_loop_tick()
+	if not music_started and song_position >= 0.0:
+		_start_music()
 
-	if last_loop_position < EVALUATION_TIME and loop_position >= EVALUATION_TIME:
-		_evaluate_performance()
+	if song_position >= 0:
+		loop_position = fmod(song_position, LOOP_DURATION)
+		if loop_position < last_loop_position:
+			_on_loop_tick()
+		if last_loop_position < EVALUATION_TIME and loop_position >= EVALUATION_TIME:
+			_evaluate_performance()
+		last_loop_position = loop_position
+		loop_time_label.text = "[DEBUG] Loop: %.2fs" % loop_position
+	else:
+		loop_time_label.text = "[DEBUG] Get Ready..."
 
 	_spawn_notes_from_active_charts()
 
 	if fever_meter > FEVER_METER_MIN:
 		set_fever_meter(fever_meter - fever_decay_rate * delta)
 
-	last_loop_position = loop_position
-	loop_time_label.text = "[DEBUG] Loop: %.2fs" % loop_position # Update loop time display
 
-
-# --- MODIFIED: Implements delayed music level-up ---
 func _on_loop_tick():
 	print("--- LOOP TICK --- Note Level: %d, Music Level: %d" % [next_level, active_music_level])
 	var loops_passed = floor(song_position / LOOP_DURATION)
@@ -239,13 +228,10 @@ func _on_loop_tick():
 	var old_level = current_level
 	current_level = next_level
 
-	# GDD Compliance: Logic for music level transition
 	if current_level > old_level:
-		# LEVEL UP: Don't change the music yet. Set a flag to wait for the player's hit.
 		is_awaiting_level_sync_hit = true
 		print("Awaiting player hit to sync music to level %d" % current_level)
 	else:
-		# STAY or LEVEL DOWN: Music can change immediately.
 		if active_music_level != current_level:
 			active_music_level = current_level
 			_update_music_volume()
@@ -283,7 +269,6 @@ func _evaluate_performance():
 		next_loop_spawn_indices.clear()
 
 
-# --- Spawning Logic (Unchanged) ---
 func _prepare_for_new_loop():
 	notes_in_current_loop = 0
 	for level_idx in range(current_level + 1):
@@ -322,14 +307,15 @@ func spawn_note(target_time: float, track_id: int):
 	note_instance.missed.connect(_on_note_missed.bind(note_instance))
 
 
-# --- Input and Judgment (Unchanged) ---
 func _unhandled_input(_event: InputEvent):
+	if song_position < -timing_window_ok:
+		return
+
 	var hit_time = song_position
 	if Input.is_action_just_pressed("hit_track1"): process_player_hit(hit_time, 1)
 	elif Input.is_action_just_pressed("hit_track2"): process_player_hit(hit_time, 2)
 	elif Input.is_action_just_pressed("hit_track3"): process_player_hit(hit_time, 3)
 
-# --- MODIFIED: Checks flag to trigger music level-up ---
 func process_player_hit(hit_time: float, track_id: int):
 	var best_note_on_track: Node = null
 	var min_diff = timing_window_ok + 0.1
@@ -342,14 +328,10 @@ func process_player_hit(hit_time: float, track_id: int):
 	if best_note_on_track == null or min_diff > timing_window_ok:
 		return
 
-	if not music_started:
-		_trigger_forge_start(best_note_on_track.target_time)
-		hit_time = song_position
-	# --- GDD Compliance: Player's hit triggers the new music layer ---
-	elif is_awaiting_level_sync_hit:
+	if is_awaiting_level_sync_hit:
 		active_music_level = current_level
 		_update_music_volume()
-		is_awaiting_level_sync_hit = false # Reset flag
+		is_awaiting_level_sync_hit = false
 		print("Music synced to level %d by player action!" % active_music_level)
 
 	var timing_error = best_note_on_track.target_time - hit_time
@@ -368,6 +350,7 @@ func process_player_hit(hit_time: float, track_id: int):
 
 	active_notes.erase(best_note_on_track)
 	best_note_on_track.hit()
+
 
 func _on_note_missed(note_missed: Node):
 	if active_notes.has(note_missed):
@@ -391,8 +374,6 @@ func _on_note_judged(judgment: String, track_id: int, score_change: int, is_empo
 			set_fever_meter(FEVER_METER_MIN)
 			consecutive_misses += 1
 			sfx_miss.play()
-			# GDD Compliance: If a level-up was pending, a miss cancels it.
-			# The music stays at the lower level for the repeated loop.
 			if is_awaiting_level_sync_hit:
 				is_awaiting_level_sync_hit = false
 
@@ -417,7 +398,6 @@ func _on_note_judged(judgment: String, track_id: int, score_change: int, is_empo
 	_update_ui()
 
 
-# --- UI and Scoring Helpers (Unchanged) ---
 func set_fever_meter(value: float):
 	fever_meter = clamp(value, FEVER_METER_MIN, FEVER_METER_MAX)
 	if is_instance_valid(fever_meter_bar): fever_meter_bar.value = fever_meter
