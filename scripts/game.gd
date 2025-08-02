@@ -462,6 +462,8 @@ func _update_progression():
 	# --- 1. Find the current tier and level based on score ---
 	var potential_tier_idx = 0
 	var potential_level_idx = 0
+	var found_level = false
+
 	for i in range(progression_data.size() - 1, -1, -1):
 		var tier = progression_data[i]
 		var levels = tier["levels"]
@@ -469,9 +471,11 @@ func _update_progression():
 			if total_score >= levels[j]["score_threshold"]:
 				potential_tier_idx = i
 				potential_level_idx = j
-				# Exit both loops once the correct level is found
-				i = -1
+				found_level = true
 				break
+
+		if found_level:
+			break
 
 	# --- 2. Apply checkpoint rules ---
 	# Rule #2 (Visual Floor): Cannot drop below the highest checkpoint tier reached.

@@ -87,23 +87,23 @@ position = Vector2(150, 256)
 
 [node name="Track" type="ColorRect" parent="."]
 anchors_preset = -1
-offset_left = 493.0
+offset_left = 232.0
 offset_top = 403.0
-offset_right = 1141.0
+offset_right = 880.0
 offset_bottom = 577.0
 color = Color(0.207512, 0.207512, 0.207512, 1)
 
 [node name="SpawnPoint" type="Marker2D" parent="."]
-position = Vector2(1141, 490)
+position = Vector2(880, 490)
 
 [node name="TargetZone" type="Marker2D" parent="."]
-position = Vector2(489, 490)
+position = Vector2(228, 490)
 
 [node name="HintI" type="Label" parent="."]
 anchors_preset = -1
-offset_left = 469.0
+offset_left = 208.0
 offset_top = 416.0
-offset_right = 519.0
+offset_right = 258.0
 offset_bottom = 466.0
 theme_override_font_sizes/font_size = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_h2q0q")
@@ -114,9 +114,9 @@ vertical_alignment = 1
 
 [node name="HintJ" type="Label" parent="."]
 anchors_preset = -1
-offset_left = 469.0
+offset_left = 208.0
 offset_top = 466.0
-offset_right = 519.0
+offset_right = 258.0
 offset_bottom = 516.0
 theme_override_font_sizes/font_size = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_h2q0q")
@@ -127,9 +127,9 @@ vertical_alignment = 1
 
 [node name="HintN" type="Label" parent="."]
 anchors_preset = -1
-offset_left = 469.0
+offset_left = 208.0
 offset_top = 516.0
-offset_right = 519.0
+offset_right = 258.0
 offset_bottom = 566.0
 theme_override_font_sizes/font_size = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_h2q0q")
@@ -187,10 +187,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -534.0
-offset_top = -193.0
-offset_right = -184.0
-offset_bottom = -103.0
+offset_left = -175.0
+offset_top = -120.0
+offset_right = 175.0
+offset_bottom = -30.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_main_tier_container")
