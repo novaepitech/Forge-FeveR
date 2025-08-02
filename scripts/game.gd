@@ -262,16 +262,17 @@ func _evaluate_performance():
 	else:
 		success_rate = 1.0
 
+	print("You missed %d notes" % (notes_in_current_loop - notes_hit_in_current_loop))
 	var old_next_level = next_level
-	if success_rate >= 1.0:
+	if success_rate >= 0.90:
 		next_level = min(current_level + 1, MAX_LEVEL)
-		print("EVAL: LEVEL UP!")
+		print("EVAL: LEVEL UP! (>=90%)")
 	elif success_rate >= 0.8:
 		next_level = current_level
-		print("EVAL: STAY!")
+		print("EVAL: STAY! (%.0f%%)" % (success_rate * 100))
 	else:
 		next_level = max(current_level - 1, 0)
-		print("EVAL: LEVEL DOWN!")
+		print("EVAL: LEVEL DOWN! (%.0f%%)" % (success_rate * 100))
 
 	if next_level > old_next_level:
 		sfx_level_up.play()
