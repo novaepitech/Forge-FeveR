@@ -9,7 +9,7 @@
 - **Pitch :** _Forge FeveR_ est un jeu de rythme arcade avec une touche de roguelite, où le joueur incarne un forgeron au tempérament de feu. Au sein de courtes boucles musicales qui s'intensifient, le joueur doit réussir des actions en rythme sur trois pistes thématiques pour débloquer des multiplicateurs de score exponentiels. Sa performance à chaque boucle détermine s'il progresse vers un défi plus grand, stagne, ou est renvoyé à un niveau de difficulté inférieur.
 - **Piliers de Design :**
   1.  **Satisfaction Exponentielle :** Le plaisir vient de voir des chiffres exploser, passant de scores modestes à des gains colossaux en une fraction de seconde.
-  2.  **Quête de la Perfection :** Le jeu ne récompense pas la médiocrité. Seule la perfection (100% de réussite sur une boucle) permet de progresser vers les plus grands défis.
+  2.  **Quête de la Perfection :** Le jeu ne récompense pas la médiocrité. Seule la perfection (90% ou plus de réussite sur une boucle) permet de progresser vers les plus grands défis.
   3.  **Feedback Sensoriel Intense :** Chaque action doit être accompagnée d'un son percutant, d'un visuel éclatant et d'une sensation de puissance.
   4.  **Punition des Erreurs :** Les erreurs sont sévèrement punies, non seulement par des pénalités de score, mais aussi par une possible régression du niveau de difficulté, renforçant l'importance de la précision.
 - **Genre :** Jeu de rythme, Jeu d'arcade, Roguelite-like.
@@ -37,8 +37,8 @@ Le jeu n'est pas une succession de niveaux, mais un flux continu et ininterrompu
     - **Phase 4 - Déclenchement (`24s`) :** Au moment exact où la boucle recommence, le joueur doit frapper la première note de la nouvelle séquence. Cette action **déclenche** l'ajout (ou le retrait) des couches musicales correspondant au nouveau niveau de difficulté. L'enchaînement est parfait et l'action ne s'arrête jamais.
 
 - **Règles de Transition (appliquées à `21s`) :**
-    - **Promotion (Level Up) :** **100% de notes réussies.** Le joueur affrontera le niveau supérieur.
-    - **Stagnation (Stay) :** **Entre 80% et 99% de notes réussies.** Le joueur rejouera le même niveau.
+    - **Promotion (Level Up) :** **90% ou plus de notes réussies.** Le joueur affrontera le niveau supérieur.
+    - **Stagnation (Stay) :** **Entre 80% et 89% de notes réussies.** Le joueur rejouera le même niveau.
     - **Régression (Level Down) :** **Moins de 80% de notes réussies.** Le joueur est renvoyé au niveau précédent (minimum Niveau 1).
 
 #### **2.2. Core Loop (L'expérience du joueur)**
