@@ -16,6 +16,12 @@ const VOLUME_MUTED_DB: float = -80.0
 const LOOP_DURATION: float = 24.0
 const EVALUATION_TIME: float = 21.0
 
+# --- Scoring & Empowered Notes Parameters ---
+const SCORE_VALUES = { "Perfect": 1000, "Good": 250, "OK": 50, "Miss": 0 }
+const EMPOWERED_BONUS: int = 1500
+const EMPOWERED_CHANCE_NEW: float = 0.15   # 15% chance for notes of the current level
+const EMPOWERED_CHANCE_OLD: float = 0.02   # 2% chance for notes of previous levels
+
 @export_group("Timing Windows")
 @export var timing_window_perfect: float = 0.04
 @export var timing_window_good: float = 0.08
@@ -83,8 +89,6 @@ var current_sword_state_index: int = 0
 var highest_checkpoint_reached: int = 0
 var consecutive_misses: int = 0
 var base_miss_penalty: int = 500
-const SCORE_VALUES = { "Perfect": 1000, "Good": 250, "OK": 50, "Miss": 0 }
-const EMPOWERED_BONUS = 1500
 
 # --- Loop State ---
 var loop_position: float = 0.0
@@ -109,6 +113,9 @@ var is_awaiting_level_sync_hit: bool = false
 @onready var multiplier_label: Label = $UI/MultiplierLabel
 @onready var fever_meter_bar: ProgressBar = $UI/FeverMeterBar
 @onready var sword_display: Sprite2D = $SwordDisplay
+@onready var loop_time_label: Label = $UI/LoopTimeLabel
+@onready var transition_feedback_label: Label = $UI/TransitionFeedbackLabel
+@onready var transition_feedback_timer: Timer = $TransitionFeedbackTimer
 
 # --- Audio Node References ---
 @onready var music_layers: Dictionary = {
@@ -121,7 +128,6 @@ var is_awaiting_level_sync_hit: bool = false
 @onready var sfx_miss: AudioStreamPlayer = $SFX/SfxMiss
 @onready var sfx_level_up: AudioStreamPlayer = $SFX/SfxLevelUp
 @onready var sfx_level_down: AudioStreamPlayer = $SFX/SfxLevelDown
-@onready var loop_time_label: Label = $UI/LoopTimeLabel
 
 
 func _ready():
@@ -205,9 +211,8 @@ func _process(delta):
 
 	if song_position >= 0:
 		loop_position = fmod(song_position, LOOP_DURATION)
-		# Check if we have just crossed the evaluation time for this loop
 		if last_loop_position < EVALUATION_TIME and loop_position >= EVALUATION_TIME:
-			_end_of_loop_procedure() # Call our new, combined function
+			_end_of_loop_procedure()
 		last_loop_position = loop_position
 		loop_time_label.text = "[DEBUG] Loop: %.2fs" % loop_position
 	else:
@@ -220,7 +225,6 @@ func _process(delta):
 
 
 func _end_of_loop_procedure():
-	# --- Part 1: Evaluate performance of the loop that just ended ---
 	var success_rate: float = 0.0
 	if notes_in_current_loop > 0:
 		success_rate = float(notes_hit_in_current_loop) / float(notes_in_current_loop)
@@ -228,29 +232,27 @@ func _end_of_loop_procedure():
 		success_rate = 1.0
 
 	print("Loop Eval: %d / %d notes hit (%.0f%%)" % [notes_hit_in_current_loop, notes_in_current_loop, success_rate * 100])
-	var old_next_level = next_level
+
+	var old_level_for_sfx_check = next_level
 	if success_rate >= 0.90:
 		next_level = min(current_level + 1, MAX_LEVEL)
-		print("EVAL: LEVEL UP! (>=90%)")
+		if next_level > current_level: _show_transition_feedback("LEVEL UP!", Color.PALE_GREEN)
+		else: _show_transition_feedback("MAX LEVEL!", Color.GOLD)
 	elif success_rate >= 0.8:
 		next_level = current_level
-		print("EVAL: STAY! (%.0f%%)" % (success_rate * 100))
+		_show_transition_feedback("STAY", Color.WHITE_SMOKE)
 	else:
 		next_level = max(current_level - 1, 0)
-		print("EVAL: LEVEL DOWN! (%.0f%%)" % (success_rate * 100))
+		if next_level < current_level: _show_transition_feedback("LEVEL DOWN!", Color.INDIAN_RED)
+		else: _show_transition_feedback("STAY", Color.WHITE_SMOKE)
 
-	if next_level > old_next_level:
-		sfx_level_up.play()
-	elif next_level < old_next_level:
-		sfx_level_down.play()
+	if next_level > old_level_for_sfx_check: sfx_level_up.play()
+	elif next_level < old_level_for_sfx_check: sfx_level_down.play()
 
-	if next_level != old_next_level:
-		next_loop_spawn_indices.clear()
+	if next_level != old_level_for_sfx_check: next_loop_spawn_indices.clear()
 
-	# --- Part 2: Immediately transition the game state to prepare for the *next* loop ---
 	print("--- Preparing for next loop. New Note Level: %d, Current Music Level: %d ---" % [next_level, active_music_level])
 
-	# Set the start time for the upcoming loop, which the spawner will use
 	var loops_passed = floor(song_position / LOOP_DURATION)
 	current_loop_start_time = (loops_passed + 1) * LOOP_DURATION
 
@@ -260,17 +262,15 @@ func _end_of_loop_procedure():
 	if current_level > old_level:
 		is_awaiting_level_sync_hit = true
 		print("Awaiting player hit to sync music to level %d" % current_level)
-	else: # If we level down or stay, sync the music immediately
+	else:
 		if active_music_level != current_level:
 			active_music_level = current_level
 			_update_music_volume()
 
-	# --- Part 3: Prepare counters and indices for the new loop ---
 	current_loop_spawn_indices = next_loop_spawn_indices.duplicate(true)
 	next_loop_spawn_indices.clear()
-
-	_prepare_for_new_loop() # This now just calculates total notes
-	notes_hit_in_current_loop = 0 # Reset hit counter for the new loop
+	_prepare_for_new_loop()
+	notes_hit_in_current_loop = 0
 
 
 func _prepare_for_new_loop():
@@ -289,7 +289,7 @@ func _spawn_notes_from_active_charts():
 				var note_data = chart[spawn_idx]
 				var note_time_absolute = note_data.time + loop_start_time
 				if song_position >= note_time_absolute - lookahead_time:
-					spawn_note(note_time_absolute, note_data.track)
+					spawn_note(note_time_absolute, note_data.track, level_idx)
 					spawn_idx += 1
 				else:
 					break
@@ -299,13 +299,23 @@ func _spawn_notes_from_active_charts():
 	spawn_helper.call(0, next_level, next_loop_spawn_indices, current_loop_start_time + LOOP_DURATION)
 
 
-func spawn_note(target_time: float, track_id: int):
+func spawn_note(target_time: float, track_id: int, note_level: int):
+	var is_empowered := false
+	var chance := 0.0
+	if note_level == current_level and current_level > 0:
+		chance = EMPOWERED_CHANCE_NEW
+	elif note_level < current_level:
+		chance = EMPOWERED_CHANCE_OLD
+
+	if randf() < chance:
+		is_empowered = true
+
 	var note_instance = NoteScene.instantiate()
 	add_child(note_instance)
 	var y_pos = track_y_positions[track_id - 1]
 	var spawn_for_track = Vector2(spawn_pos_marker.global_position.x, y_pos)
 	var target_for_track = Vector2(target_pos_marker.global_position.x, y_pos)
-	note_instance.setup(target_time, self, spawn_for_track, target_for_track, track_id)
+	note_instance.setup(target_time, self, spawn_for_track, target_for_track, track_id, is_empowered)
 	active_notes.append(note_instance)
 	note_instance.missed.connect(_on_note_missed.bind(note_instance))
 
@@ -432,3 +442,12 @@ func _update_ui():
 	if not is_instance_valid(score_label): return
 	score_label.text = "%d" % total_score
 	multiplier_label.text = "x%d" % score_multiplier
+
+func _show_transition_feedback(text: String, color: Color):
+	transition_feedback_label.text = text
+	transition_feedback_label.modulate = color
+	transition_feedback_label.visible = true
+	transition_feedback_timer.start()
+
+func _on_transition_feedback_timer_timeout():
+	transition_feedback_label.visible = false

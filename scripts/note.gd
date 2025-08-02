@@ -2,6 +2,8 @@ extends Area2D
 
 signal missed
 
+@onready var color_rect: ColorRect = $ColorRect
+
 var target_time: float = 0.0
 var game_node
 var spawn_position: Vector2
@@ -15,13 +17,18 @@ var is_empowered: bool = false
 # A state to prevent multiple behaviors (e.g., being missed after being hit).
 var is_hit: bool = false
 
-func setup(p_target_time: float, p_game_node, p_spawn_pos: Vector2, p_target_pos: Vector2, p_track_id: int):
+func setup(p_target_time: float, p_game_node, p_spawn_pos: Vector2, p_target_pos: Vector2, p_track_id: int, p_is_empowered: bool):
 	self.target_time = p_target_time
 	self.game_node = p_game_node
 	self.spawn_position = p_spawn_pos
 	self.target_position = p_target_pos
 	self.global_position = spawn_position
 	self.track_id = p_track_id
+
+	self.is_empowered = p_is_empowered
+	if is_empowered:
+		# Visually distinguish empowered notes
+		color_rect.color = Color.GOLD
 
 func _process(_delta: float):
 	if not is_instance_valid(game_node) or is_hit:
