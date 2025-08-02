@@ -1,7 +1,9 @@
+# Forge FeveR/scripts/game.gd
 extends Node2D
 
 # --- Game Parameters ---
 const NoteScene = preload("res://scenes/note.tscn")
+@export var HitFeedbackPopup: PackedScene
 @export var lookahead_time: float = 2.0
 @export var track_y_positions: Array[float] = [440.0, 490.0, 540.0]
 @export var initial_delay: float = 2.0
@@ -17,8 +19,8 @@ const EVALUATION_TIME: float = 21.0
 # --- Scoring & Empowered Notes Parameters ---
 const SCORE_VALUES = { "Perfect": 1000, "Good": 250, "OK": 50, "Miss": 0 }
 const EMPOWERED_BONUS: int = 1500
-const EMPOWERED_CHANCE_NEW: float = 0.20   # 20% chance for notes of the current level
-const EMPOWERED_CHANCE_OLD: float = 0.07   # 7% chance for notes of previous levels
+const EMPOWERED_CHANCE_NEW: float = 0.20
+const EMPOWERED_CHANCE_OLD: float = 0.07
 
 @export_group("Timing Windows")
 @export var timing_window_perfect: float = 0.04
@@ -29,9 +31,15 @@ const EMPOWERED_CHANCE_OLD: float = 0.07   # 7% chance for notes of previous lev
 @export var fever_gain_perfect: float = 10.0
 @export var fever_penalty_imperfect: float = 5.0
 @export var fever_decay_rate: float = 2.5
+@export var fever_bar_lerp_speed: float = 8.0 # Speed for smooth visual decay
 
 const FEVER_METER_MIN: float = 0.0
 const FEVER_METER_MAX: float = 100.0
+const SUPERNOVA_THRESHOLD: float = 95.0
+
+@export_group("Feedback Settings")
+@export var shake_strength_perfect: float = 4.0
+@export var shake_strength_empowered: float = 8.0
 
 @export_group("Progression System")
 @export var sword_state_textures: Array[Texture2D]
@@ -39,58 +47,29 @@ const FEVER_METER_MAX: float = 100.0
 	{
 		"name": "SCRAP",
 		"levels": [
-			{"score_threshold": 0, "texture_index": 0},      # Niveau I
-			{"score_threshold": 65000, "texture_index": 1},  # Niveau II
-			{"score_threshold": 150000, "texture_index": 2}   # Niveau III
+			{"score_threshold": 0, "texture_index": 0},
+			{"score_threshold": 65000, "texture_index": 1},
+			{"score_threshold": 150000, "texture_index": 2}
 		]
 	},
 	{
 		"name": "IRON",
 		"levels": [
-			{"score_threshold": 450000, "texture_index": 3},  # Niveau I
-			{"score_threshold": 900000, "texture_index": 3},  # Niveau II
-			{"score_threshold": 1600000, "texture_index": 4}  # Niveau III
+			{"score_threshold": 450000, "texture_index": 3},
+			{"score_threshold": 900000, "texture_index": 3},
+			{"score_threshold": 1600000, "texture_index": 4}
 		]
 	}
 ]
 
 var all_charts: Dictionary = {
-	0: [
-		{"time": 0.0, "track": 1},
-		{"time": 3.0, "track": 2},
-		{"time": 6.0, "track": 1},
-		{"time": 9.0, "track": 2},
-		{"time": 12.0, "track": 1},
-		{"time": 15.0, "track": 2},
-		{"time": 17.0, "track": 3},
-		{"time": 19.0, "track": 2}
-	],
-	1: [
-		{"time": 3.5, "track": 3},
-		{"time": 6.5, "track": 1},
-		{"time": 9.5, "track": 3},
-		{"time": 12.5, "track": 1},
-		{"time": 15.5, "track": 3},
-		{"time": 18.5, "track": 1}
-	],
-	2: [
-		{"time": 2.75, "track": 2},
-		{"time": 5.75, "track": 1},
-		{"time": 8.75, "track": 3},
-		{"time": 11.75, "track": 1},
-		{"time": 14.75, "track": 2},
-		{"time": 17.75, "track": 3}
-	],
-	3: [
-		{"time": 4.25, "track": 2},
-		{"time": 5.375, "track": 1},
-		{"time": 10.25, "track": 2},
-		{"time": 14.375, "track": 1},
-		{"time": 16.25, "track": 3},
-		{"time": 19.25, "track": 2}
-	]
+	0: [{"time": 0.0, "track": 1}, {"time": 3.0, "track": 2}, {"time": 6.0, "track": 1}, {"time": 9.0, "track": 2}, {"time": 12.0, "track": 1}, {"time": 15.0, "track": 2}, {"time": 17.0, "track": 3}, {"time": 19.0, "track": 2}],
+	1: [{"time": 3.5, "track": 3}, {"time": 6.5, "track": 1}, {"time": 9.5, "track": 3}, {"time": 12.5, "track": 1}, {"time": 15.5, "track": 3}, {"time": 18.5, "track": 1}],
+	2: [{"time": 2.75, "track": 2}, {"time": 5.75, "track": 1}, {"time": 8.75, "track": 3}, {"time": 11.75, "track": 1}, {"time": 14.75, "track": 2}, {"time": 17.75, "track": 3}],
+	3: [{"time": 4.25, "track": 2}, {"time": 5.375, "track": 1}, {"time": 10.25, "track": 2}, {"time": 14.375, "track": 1}, {"time": 16.25, "track": 3}, {"time": 19.25, "track": 2}]
 }
 
+# --- Game State Variables ---
 var MAX_LEVEL: int
 var song_position: float = 0.0
 var active_notes: Array[Node] = []
@@ -104,7 +83,6 @@ var current_tier_index: int = 0
 var current_level_index: int = 0
 var highest_tier_checkpoint_index: int = 0
 
-# --- Loop State ---
 var loop_position: float = 0.0
 var last_loop_position: float = 0.0
 var current_loop_start_time: float = 0.0
@@ -115,14 +93,16 @@ var notes_hit_in_current_loop: int = 0
 var current_loop_spawn_indices: Dictionary = {}
 var next_loop_spawn_indices: Dictionary = {}
 
-# --- State Variables for Music Start & Sync ---
 var music_started: bool = false
 var active_music_level: int = 0
 var is_awaiting_level_sync_hit: bool = false
 
-# --- UI Styles Variables ---
 var _settings_bar_active: LabelSettings
 var _settings_bar_inactive: LabelSettings
+
+var is_supernova_active: bool = false
+var supernova_tween: Tween
+var fever_bar_tween: Tween # <-- ADDED: To manage the bar's animation state
 
 # --- Node References ---
 @onready var spawn_pos_marker: Marker2D = $SpawnPoint
@@ -135,37 +115,38 @@ var _settings_bar_inactive: LabelSettings
 @onready var transition_feedback_label: Label = $UI/TransitionFeedbackLabel
 @onready var transition_feedback_timer: Timer = $TransitionFeedbackTimer
 @onready var tier_name_label: Label = $UI/TierDisplay/TierNameLabel
-@onready var level_bars: Array[Label] = [
-	$UI/TierDisplay/LevelBarsContainer/LevelBar1,
-	$UI/TierDisplay/LevelBarsContainer/LevelBar2,
-	$UI/TierDisplay/LevelBarsContainer/LevelBar3,
-]
+@onready var level_bars: Array[Label] = [$UI/TierDisplay/LevelBarsContainer/LevelBar1, $UI/TierDisplay/LevelBarsContainer/LevelBar2, $UI/TierDisplay/LevelBarsContainer/LevelBar3]
 
-# --- Audio Node References ---
-@onready var music_layers: Dictionary = {
-	0: $MusicLayers/MusicLayer1,
-	1: $MusicLayers/MusicLayer2,
-	2: $MusicLayers/MusicLayer3
-}
+@onready var music_layers: Dictionary = {0: $MusicLayers/MusicLayer1, 1: $MusicLayers/MusicLayer2, 2: $MusicLayers/MusicLayer3}
 @onready var sfx_perfect: AudioStreamPlayer = $SFX/SfxPerfect
 @onready var sfx_imperfect: AudioStreamPlayer = $SFX/SfxImperfect
 @onready var sfx_miss: AudioStreamPlayer = $SFX/SfxMiss
 @onready var sfx_level_up: AudioStreamPlayer = $SFX/SfxLevelUp
 @onready var sfx_level_down: AudioStreamPlayer = $SFX/SfxLevelDown
 
+# --- Feedback Node References ---
+@onready var camera: Camera2D = $Camera2D
+@onready var popup_container: Node2D = $UI/PopupContainer
+@onready var target_flashes: Dictionary = {1: $TargetFlashes/FlashTrack1, 2: $TargetFlashes/FlashTrack2, 3: $TargetFlashes/FlashTrack3}
+@onready var hit_particles: Dictionary = {
+	"Perfect": $HitParticles/ParticlesPerfect, "Empowered": $HitParticles/ParticlesEmpowered,
+	"Good": $HitParticles/ParticlesGood, "OK": $HitParticles/ParticlesGood, "Miss": $HitParticles/ParticlesMiss
+}
+@onready var supernova_flame: AnimatedSprite2D = $UI/FeverMeterBar/SupernovaFlame
+@onready var multiplier_tier_labels: Dictionary = {
+	2: $UI/FeverMeterBar/MultiplierTiers/Tier2x, 4: $UI/FeverMeterBar/MultiplierTiers/Tier4x,
+	8: $UI/FeverMeterBar/MultiplierTiers/Tier8x, 16: $UI/FeverMeterBar/MultiplierTiers/Tier16x,
+	32: $UI/FeverMeterBar/MultiplierTiers/Tier32x
+}
 
 func _ready():
 	MAX_LEVEL = all_charts.keys().max()
-
-	# Retrieve styles from pre-configured nodes
 	_capture_ui_styles()
-
 	reset_game_state()
 	_initialize_audio()
 
 
 func _capture_ui_styles():
-	# Capture the LabelSettings for the active and inactive bars
 	_settings_bar_active = level_bars[0].label_settings
 	_settings_bar_inactive = level_bars[1].label_settings
 
@@ -180,7 +161,7 @@ func reset_game_state():
 
 	total_score = 0
 	score_multiplier = 1
-	set_fever_meter(FEVER_METER_MIN)
+	set_fever_meter(FEVER_METER_MIN, false)
 	consecutive_misses = 0
 
 	current_tier_index = 0
@@ -207,6 +188,7 @@ func reset_game_state():
 		sword_display.visible = true
 	_update_progression() # Initializes progression state
 
+	_update_fever_state()
 	_update_ui()
 
 	if is_node_ready():
@@ -228,8 +210,7 @@ func _start_music():
 
 
 func _update_music_volume():
-	if not music_started:
-		return
+	if not music_started: return
 	for level in music_layers:
 		var player = music_layers[level]
 		if level <= active_music_level:
@@ -254,9 +235,18 @@ func _process(delta):
 		loop_time_label.text = "[DEBUG] Get Ready..."
 
 	_spawn_notes_from_active_charts()
+	_update_fever_meter_visuals(delta)
 
+
+func _update_fever_meter_visuals(delta: float):
 	if fever_meter > FEVER_METER_MIN:
-		set_fever_meter(fever_meter - fever_decay_rate * delta)
+		var new_fever_value = fever_meter - fever_decay_rate * delta
+		set_fever_meter(new_fever_value, false)
+
+	# --- CORRECTED LINE ---
+	# Only lerp for smooth decay if no "pop" tween is currently active
+	if not (fever_bar_tween and fever_bar_tween.is_valid()):
+		fever_meter_bar.value = lerp(fever_meter_bar.value, fever_meter, delta * fever_bar_lerp_speed)
 
 
 func _end_of_loop_procedure():
@@ -265,8 +255,6 @@ func _end_of_loop_procedure():
 		success_rate = float(notes_hit_in_current_loop) / float(notes_in_current_loop)
 	else:
 		success_rate = 1.0
-
-	print("Loop Eval: %d / %d notes hit (%.0f%%)" % [notes_hit_in_current_loop, notes_in_current_loop, success_rate * 100])
 
 	var old_level_for_sfx_check = next_level
 	if success_rate >= 0.90:
@@ -286,8 +274,6 @@ func _end_of_loop_procedure():
 
 	if next_level != old_level_for_sfx_check: next_loop_spawn_indices.clear()
 
-	print("--- Preparing for next loop. New Note Level: %d, Current Music Level: %d ---" % [next_level, active_music_level])
-
 	var loops_passed = floor(song_position / LOOP_DURATION)
 	current_loop_start_time = (loops_passed + 1) * LOOP_DURATION
 
@@ -296,7 +282,6 @@ func _end_of_loop_procedure():
 
 	if current_level > old_level:
 		is_awaiting_level_sync_hit = true
-		print("Awaiting player hit to sync music to level %d" % current_level)
 	else:
 		if active_music_level != current_level:
 			active_music_level = current_level
@@ -352,82 +337,84 @@ func spawn_note(target_time: float, track_id: int, note_level: int):
 	var target_for_track = Vector2(target_pos_marker.global_position.x, y_pos)
 	note_instance.setup(target_time, self, spawn_for_track, target_for_track, track_id, is_empowered)
 	active_notes.append(note_instance)
-	note_instance.missed.connect(_on_note_missed.bind(note_instance))
+	note_instance.missed.connect(_on_note_missed)
 
 
 func _unhandled_input(_event: InputEvent):
-	if song_position < -timing_window_ok:
-		return
+	if song_position < -timing_window_ok: return
 
 	var hit_time = song_position
-	if Input.is_action_just_pressed("hit_track1"): process_player_hit(hit_time, 1)
-	elif Input.is_action_just_pressed("hit_track2"): process_player_hit(hit_time, 2)
-	elif Input.is_action_just_pressed("hit_track3"): process_player_hit(hit_time, 3)
+	var track_id = 0
+	if Input.is_action_just_pressed("hit_track1"): track_id = 1
+	elif Input.is_action_just_pressed("hit_track2"): track_id = 2
+	elif Input.is_action_just_pressed("hit_track3"): track_id = 3
+
+	if track_id > 0:
+		process_player_hit(hit_time, track_id)
 
 func process_player_hit(hit_time: float, track_id: int):
-	var best_note_on_track: Node = null
+	var best_note: Node = null
 	var min_diff = timing_window_ok + 0.1
 	for note in active_notes:
 		if note.track_id == track_id:
 			var diff = abs(note.target_time - hit_time)
 			if diff < min_diff:
 				min_diff = diff
-				best_note_on_track = note
-	if best_note_on_track == null or min_diff > timing_window_ok:
-		return
+				best_note = note
 
-	if is_awaiting_level_sync_hit:
-		active_music_level = current_level
-		_update_music_volume()
-		is_awaiting_level_sync_hit = false
-		print("Music synced to level %d by player action!" % active_music_level)
+	if best_note:
+		var timing_error = best_note.target_time - hit_time
+		var judgment: String
+		if abs(timing_error) <= timing_window_perfect: judgment = "Perfect"
+		elif abs(timing_error) <= timing_window_good: judgment = "Good"
+		else: judgment = "OK"
 
-	var timing_error = best_note_on_track.target_time - hit_time
-	var judgment: String
-	var abs_error = abs(timing_error)
-	if abs_error <= timing_window_perfect: judgment = "Perfect"
-	elif abs_error <= timing_window_good: judgment = "Good"
-	else: judgment = "OK"
-
-	var score_change = SCORE_VALUES.get(judgment, 0)
-	var is_empowered_perfect = (judgment == "Perfect" and best_note_on_track.is_empowered)
-	if is_empowered_perfect:
-		score_change += EMPOWERED_BONUS
-
-	_on_note_judged(judgment, score_change)
-
-	active_notes.erase(best_note_on_track)
-	best_note_on_track.hit()
-
+		_process_judgment(judgment, best_note)
+		active_notes.erase(best_note)
+		best_note.hit()
+	else:
+		_process_judgment("Miss", null, track_id)
 
 func _on_note_missed(note_missed: Node):
 	if active_notes.has(note_missed):
 		active_notes.erase(note_missed)
-	_on_note_judged("Miss", 0)
+	_process_judgment("Miss", note_missed)
 
 
-func _on_note_judged(judgment: String, score_change: int):
+# --- CENTRAL JUDGMENT PROCESSING ---
+func _process_judgment(judgment: String, note: Node, miss_track_id: int = -1):
+	var track_id = note.track_id if note else miss_track_id
+	var position = note.global_position if note else Vector2(target_pos_marker.global_position.x, track_y_positions[track_id - 1])
+	var is_empowered = note.is_empowered if note else false
+
+	var score_change = 0
+	var is_empowered_perfect = (judgment == "Perfect" and is_empowered)
+	if is_empowered_perfect:
+		score_change = SCORE_VALUES["Perfect"] + EMPOWERED_BONUS
+	else:
+		score_change = SCORE_VALUES.get(judgment, 0)
+	
+	_trigger_all_feedback(judgment, track_id, position, is_empowered_perfect, score_change)
+
 	match judgment:
 		"Perfect":
 			notes_hit_in_current_loop += 1
-			set_fever_meter(fever_meter + fever_gain_perfect)
+			set_fever_meter(fever_meter + fever_gain_perfect, true)
 			consecutive_misses = 0
 			sfx_perfect.play()
+			if is_awaiting_level_sync_hit: _sync_music_on_hit()
 		"Good", "OK":
 			notes_hit_in_current_loop += 1
-			set_fever_meter(fever_meter - fever_penalty_imperfect)
+			set_fever_meter(fever_meter - fever_penalty_imperfect, false)
 			consecutive_misses = 0
 			sfx_imperfect.play()
+			if is_awaiting_level_sync_hit: _sync_music_on_hit()
 		"Miss":
-			set_fever_meter(FEVER_METER_MIN)
+			set_fever_meter(FEVER_METER_MIN, true)
 			consecutive_misses += 1
+			score_multiplier = 1
 			sfx_miss.play()
-			if is_awaiting_level_sync_hit:
-				is_awaiting_level_sync_hit = false
-
-	_update_multiplier()
-	if judgment == "Miss":
-		score_multiplier = 1
+			if is_awaiting_level_sync_hit: is_awaiting_level_sync_hit = false
 
 	var final_score_change = 0
 	if judgment == "Miss":
@@ -436,76 +423,179 @@ func _on_note_judged(judgment: String, score_change: int):
 		final_score_change = score_change * score_multiplier
 
 	total_score += final_score_change
-
 	_update_progression()
-
+	_update_fever_state()
 	_update_ui()
 
 
-func set_fever_meter(value: float):
+func _sync_music_on_hit():
+	active_music_level = current_level
+	_update_music_volume()
+	is_awaiting_level_sync_hit = false
+
+
+# --- SENSORY FEEDBACK SUB-SYSTEMS ---
+func _trigger_all_feedback(judgment: String, track_id: int, pos: Vector2, is_empowered_perfect: bool, score: int):
+	_trigger_score_popup(judgment, pos, score, is_empowered_perfect)
+	_trigger_camera_shake(judgment, is_empowered_perfect)
+	_trigger_target_flash(judgment, track_id)
+	_trigger_hit_particles(judgment, pos, is_empowered_perfect)
+
+func _trigger_score_popup(judgment: String, pos: Vector2, score: int, is_empowered_perfect: bool):
+	var popup = HitFeedbackPopup.instantiate()
+	popup_container.add_child(popup)
+	popup.global_position = pos
+
+	var text: String; var color: Color; var font_size: int
+
+	match judgment:
+		"Perfect":
+			text = "+%d" % score
+			color = Color.GOLD
+			font_size = 32 if not is_empowered_perfect else 48
+		"Good", "OK":
+			text = "+%d" % score
+			color = Color.WHITE_SMOKE
+			font_size = 24
+		"Miss":
+			var penalty = calculate_miss_penalty()
+			text = "MISS\n-%d" % penalty
+			color = Color.INDIAN_RED
+			font_size = 28
+	
+	popup.setup(text, color, font_size, is_empowered_perfect)
+
+func _trigger_camera_shake(judgment: String, is_empowered_perfect: bool):
+	if judgment != "Perfect": return
+	var strength = shake_strength_empowered if is_empowered_perfect else shake_strength_perfect
+	var duration = 0.2
+	var tween = get_tree().create_tween().set_trans(Tween.TRANS_SINE)
+	tween.tween_property(camera, "offset", Vector2(randf_range(-strength, strength), randf_range(-strength, strength)), duration / 4)
+	tween.tween_property(camera, "offset", Vector2(randf_range(-strength, strength), randf_range(-strength, strength)), duration / 4)
+	tween.tween_property(camera, "offset", Vector2(randf_range(-strength, strength), randf_range(-strength, strength)), duration / 4)
+	tween.tween_property(camera, "offset", Vector2.ZERO, duration / 4)
+
+func _trigger_target_flash(judgment: String, track_id: int):
+	if not target_flashes.has(track_id): return
+	var flash_rect: ColorRect = target_flashes[track_id]
+	
+	var color: Color
+	match judgment:
+		"Perfect": color = Color.GOLD
+		"Good", "OK": color = Color.WHITE
+		"Miss": color = Color.RED
+		_: return
+
+	flash_rect.color = color
+	var tween = get_tree().create_tween()
+	flash_rect.modulate.a = 1.0
+	tween.tween_property(flash_rect, "modulate:a", 0.0, 0.25).set_ease(Tween.EASE_IN)
+
+func _trigger_hit_particles(judgment: String, pos: Vector2, is_empowered_perfect: bool):
+	var key = "Empowered" if is_empowered_perfect else judgment
+	if hit_particles.has(key):
+		var emitter: GPUParticles2D = hit_particles[key]
+		emitter.global_position = pos
+		emitter.restart()
+
+
+# --- FEVER METER & MULTIPLIER LOGIC ---
+func set_fever_meter(value: float, use_tween: bool):
 	fever_meter = clamp(value, FEVER_METER_MIN, FEVER_METER_MAX)
-	if is_instance_valid(fever_meter_bar): fever_meter_bar.value = fever_meter
+	
+	if use_tween:
+		# --- CORRECTED LOGIC ---
+		# Kill any previous animation to avoid conflicts
+		if fever_bar_tween and fever_bar_tween.is_valid():
+			fever_bar_tween.kill()
+		
+		# Create a new tween and store its reference
+		fever_bar_tween = create_tween()
+		fever_bar_tween.tween_property(fever_meter_bar, "value", fever_meter, 0.15).set_ease(Tween.EASE_OUT)
+	else:
+		# For decay, we don't directly set the bar value; we let the lerp handle it.
+		# But if a tween was running, we kill it so the lerp can take over.
+		if fever_bar_tween and fever_bar_tween.is_valid():
+			fever_bar_tween.kill()
+
+func _update_fever_state():
+	var old_multiplier = score_multiplier
+	if fever_meter >= SUPERNOVA_THRESHOLD: score_multiplier = 32
+	elif fever_meter >= 80.0: score_multiplier = 16
+	elif fever_meter >= 60.0: score_multiplier = 8
+	elif fever_meter >= 40.0: score_multiplier = 4
+	elif fever_meter >= 20.0: score_multiplier = 2
+	else: score_multiplier = 1
+
+	if old_multiplier != score_multiplier:
+		_update_multiplier_tier_visuals()
+
+	if fever_meter >= SUPERNOVA_THRESHOLD and not is_supernova_active:
+		_activate_supernova(true)
+	elif fever_meter < SUPERNOVA_THRESHOLD and is_supernova_active:
+		_activate_supernova(false)
+
+func _update_multiplier_tier_visuals():
+	var active_color = Color(1, 0.84, 0.2, 1)
+	var inactive_color = Color(0.4, 0.4, 0.4, 1)
+	
+	for tier_value in multiplier_tier_labels:
+		var label = multiplier_tier_labels[tier_value]
+		if score_multiplier >= tier_value:
+			label.modulate = active_color
+		else:
+			label.modulate = inactive_color
+
+func _activate_supernova(activate: bool):
+	is_supernova_active = activate
+	supernova_flame.visible = activate
+	if activate:
+		supernova_flame.play("default")
+		if supernova_tween and supernova_tween.is_valid(): supernova_tween.kill()
+		supernova_tween = create_tween().set_loops()
+		supernova_tween.tween_property(fever_meter_bar, "self_modulate", Color.ORANGE_RED, 0.5).set_trans(Tween.TRANS_SINE)
+		supernova_tween.tween_property(fever_meter_bar, "self_modulate", Color.WHITE, 0.5).set_trans(Tween.TRANS_SINE)
+	else:
+		supernova_flame.stop()
+		if supernova_tween and supernova_tween.is_valid(): supernova_tween.kill()
+		fever_meter_bar.self_modulate = Color.WHITE
 
 func calculate_miss_penalty() -> int:
 	if consecutive_misses == 0: return base_miss_penalty
 	return base_miss_penalty * (2 ** (consecutive_misses - 1))
 
-# Central Progression Logic Function
 func _update_progression():
-	# --- 1. Find the current tier and level based on score ---
-	var potential_tier_idx = 0
-	var potential_level_idx = 0
-	var found_level = false
-
+	var potential_tier_idx = 0; var potential_level_idx = 0; var found_level = false
 	for i in range(progression_data.size() - 1, -1, -1):
 		var tier = progression_data[i]
 		var levels = tier["levels"]
 		for j in range(levels.size() - 1, -1, -1):
 			if total_score >= levels[j]["score_threshold"]:
-				potential_tier_idx = i
-				potential_level_idx = j
-				found_level = true
-				break
+				potential_tier_idx = i; potential_level_idx = j; found_level = true; break
+		if found_level: break
 
-		if found_level:
-			break
-
-	# --- 2. Apply checkpoint rules ---
-	# Rule #2 (Visual Floor): Cannot drop below the highest checkpoint tier reached.
 	var final_tier_idx = max(potential_tier_idx, highest_tier_checkpoint_index)
 	var final_level_idx = potential_level_idx
-	# If forced back to a higher tier due to checkpoint,
-	# set to the lowest level of that tier.
-	if final_tier_idx > potential_tier_idx:
-		final_level_idx = 0
+	if final_tier_idx > potential_tier_idx: final_level_idx = 0
 
-	# --- 3. Detect reaching a new checkpoint tier ---
 	if final_tier_idx > highest_tier_checkpoint_index:
 		highest_tier_checkpoint_index = final_tier_idx
-		print("CHECKPOINT REACHED: Tier %s" % progression_data[highest_tier_checkpoint_index]["name"])
-		# TODO: Potentially play a sound / special effect here
 
-	# --- 4. Update game state ---
 	current_tier_index = final_tier_idx
 	current_level_index = final_level_idx
 
-	# --- 5. Apply Rule #1 (Score Floor) ---
 	var checkpoint_score_floor = progression_data[highest_tier_checkpoint_index]["levels"][0]["score_threshold"]
 	total_score = max(total_score, checkpoint_score_floor)
 
-	# --- 6. Update visuals ---
 	_update_sword_texture()
 	_update_tier_ui()
 
 
 func _update_sword_texture():
-	if not is_instance_valid(sword_display) or progression_data.is_empty():
-		return
-
+	if not is_instance_valid(sword_display) or progression_data.is_empty(): return
 	var tier_data = progression_data[current_tier_index]
 	var level_data = tier_data["levels"][current_level_index]
 	var texture_idx = level_data["texture_index"]
-
 	if sword_state_textures.size() > texture_idx:
 		var new_texture = sword_state_textures[texture_idx]
 		if new_texture and sword_display.texture != new_texture:
@@ -513,26 +603,13 @@ func _update_sword_texture():
 
 func _update_tier_ui():
 	if not is_instance_valid(tier_name_label): return
-
 	var tier_data = progression_data[current_tier_index]
 	tier_name_label.text = tier_data["name"]
-
 	for i in range(level_bars.size()):
 		var bar_label = level_bars[i]
-		# Cumulative logic: turn on all bars up to the current level index
-		if i <= current_level_index:
-			bar_label.label_settings = _settings_bar_active
-		else:
-			bar_label.label_settings = _settings_bar_inactive
+		if i <= current_level_index: bar_label.label_settings = _settings_bar_active
+		else: bar_label.label_settings = _settings_bar_inactive
 
-
-func _update_multiplier():
-	if fever_meter >= 95.0: score_multiplier = 32
-	elif fever_meter >= 80.0: score_multiplier = 16
-	elif fever_meter >= 60.0: score_multiplier = 8
-	elif fever_meter >= 40.0: score_multiplier = 4
-	elif fever_meter >= 20.0: score_multiplier = 2
-	else: score_multiplier = 1
 
 func _update_ui():
 	if not is_instance_valid(score_label): return

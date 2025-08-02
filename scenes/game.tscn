@@ -1,18 +1,75 @@
-[gd_scene load_steps=21 format=3 uid="uid://b3pm2nt526yr7"]
+[gd_scene load_steps=37 format=3 uid="uid://b3pm2nt526yr7"]
 
 [ext_resource type="Script" uid="uid://bh6srqu5h8vbj" path="res://scripts/game.gd" id="1_uwrxv"]
-[ext_resource type="Texture2D" uid="uid://pdscnrc6xxkt" path="res://assets/sprites/swords/sword_level_0.webp" id="2_iywne"]
-[ext_resource type="Texture2D" uid="uid://cjw0i32mrl7kj" path="res://assets/sprites/swords/sword_level_1.webp" id="3_p57ef"]
-[ext_resource type="Texture2D" uid="uid://cgsvm8ifylrqq" path="res://assets/sprites/swords/sword_level_2.webp" id="4_u5sy4"]
-[ext_resource type="Texture2D" uid="uid://coqrcxpsgupww" path="res://assets/sprites/swords/sword_level_3.webp" id="5_gee14"]
-[ext_resource type="Texture2D" uid="uid://6vb5rv88veow" path="res://assets/sprites/swords/sword_level_4.webp" id="6_p57ef"]
-[ext_resource type="AudioStream" uid="uid://di1w5iy6cbu8o" path="res://assets/musics/base.mp3" id="7_gee14"]
-[ext_resource type="AudioStream" uid="uid://cbjex6cmtwjjt" path="res://assets/musics/level_1.mp3" id="8_0tnpc"]
-[ext_resource type="AudioStream" uid="uid://cnw7vabx6gcb2" path="res://assets/sounds/perfect.mp3" id="9_kvuet"]
-[ext_resource type="AudioStream" uid="uid://bqw1wfhtkablf" path="res://assets/sounds/imperfect.mp3" id="10_trtic"]
-[ext_resource type="AudioStream" uid="uid://crkw3aqfafr2a" path="res://assets/sounds/miss.mp3" id="11_ir15t"]
-[ext_resource type="AudioStream" uid="uid://cn6mp6onl0vc7" path="res://assets/sounds/level_up.mp3" id="12_ca42v"]
-[ext_resource type="AudioStream" uid="uid://buiwqcrj4oo2g" path="res://assets/sounds/level_down.mp3" id="13_rysoc"]
+[ext_resource type="PackedScene" uid="uid://c5q0aax10g47x" path="res://scenes/hit_feedback_popup.tscn" id="2_2o43q"]
+[ext_resource type="Texture2D" uid="uid://pdscnrc6xxkt" path="res://assets/sprites/swords/sword_level_0.webp" id="3_g70v4"]
+[ext_resource type="Texture2D" uid="uid://cjw0i32mrl7kj" path="res://assets/sprites/swords/sword_level_1.webp" id="4_5s14w"]
+[ext_resource type="Texture2D" uid="uid://cgsvm8ifylrqq" path="res://assets/sprites/swords/sword_level_2.webp" id="5_a0n7o"]
+[ext_resource type="Texture2D" uid="uid://coqrcxpsgupww" path="res://assets/sprites/swords/sword_level_3.webp" id="6_53tq7"]
+[ext_resource type="Texture2D" uid="uid://6vb5rv88veow" path="res://assets/sprites/swords/sword_level_4.webp" id="7_v8h6g"]
+[ext_resource type="AudioStream" uid="uid://di1w5iy6cbu8o" path="res://assets/musics/base.mp3" id="8_1n0f8"]
+[ext_resource type="Shader" uid="uid://dpiypedu682bu" path="res://shaders/glow.gdshader" id="8_ca42v"]
+[ext_resource type="Texture2D" uid="uid://umook1nc0r3r" path="res://assets/sprites/FireBall/Sheets/IdleLoop-Sheet.png" id="8_ir15t"]
+[ext_resource type="AudioStream" uid="uid://cbjex6cmtwjjt" path="res://assets/musics/level_1.mp3" id="9_v36j1"]
+[ext_resource type="AudioStream" uid="uid://cnw7vabx6gcb2" path="res://assets/sounds/perfect.mp3" id="10_w0n6e"]
+[ext_resource type="AudioStream" uid="uid://bqw1wfhtkablf" path="res://assets/sounds/imperfect.mp3" id="11_h2o8l"]
+[ext_resource type="AudioStream" uid="uid://crkw3aqfafr2a" path="res://assets/sounds/miss.mp3" id="12_c1042"]
+[ext_resource type="AudioStream" uid="uid://cn6mp6onl0vc7" path="res://assets/sounds/level_up.mp3" id="13_gpl5b"]
+[ext_resource type="AudioStream" uid="uid://buiwqcrj4oo2g" path="res://assets/sounds/level_down.mp3" id="14_82vma"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_n1d6u"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 10.0
+direction = Vector3(0, -1, 0)
+initial_velocity_min = 150.0
+initial_velocity_max = 250.0
+gravity = Vector3(0, 400, 0)
+scale_min = 0.5
+scale_max = 1.5
+color = Color(1, 0.784314, 0, 1)
+hue_variation_min = -0.05
+hue_variation_max = 0.05
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_kpf8d"]
+particles_animation = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ylb4w"]
+particles_animation = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_k445f"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 5.0
+direction = Vector3(0, -0.5, 0)
+spread = 60.0
+initial_velocity_min = 50.0
+initial_velocity_max = 100.0
+gravity = Vector3(0, 200, 0)
+color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_aeg87"]
+particles_animation = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_j0u6t"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 15.0
+direction = Vector3(0, 0, 0)
+spread = 180.0
+initial_velocity_min = 80.0
+initial_velocity_max = 150.0
+gravity = Vector3(0, 100, 0)
+color = Color(0.2, 0.2, 0.2, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h2q0q"]
 bg_color = Color(0.1, 0.1, 0.1, 0.5)
@@ -33,10 +90,55 @@ font_color = Color(1, 1, 1, 0.8)
 [sub_resource type="LabelSettings" id="LabelSettings_04n7w"]
 font_size = 32
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rysoc"]
+shader = ExtResource("8_ca42v")
+shader_parameter/glow_color = Color(1, 0.7977378, 0.48452926, 1)
+shader_parameter/glow_power = 3.0000000447036
+shader_parameter/glow_shift = 0.60000000894072
+shader_parameter/glow_radius = 4.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ca42v"]
+atlas = ExtResource("8_ir15t")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rysoc"]
+atlas = ExtResource("8_ir15t")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ssvqc"]
+atlas = ExtResource("8_ir15t")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_264po"]
+atlas = ExtResource("8_ir15t")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_v0rfl"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ca42v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rysoc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ssvqc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_264po")
+}],
+"loop": true,
+"name": &"default",
+"speed": 12.0
+}]
+
 [sub_resource type="LabelSettings" id="LabelSettings_tier_name"]
 font_color = Color(0.8, 0.75, 0.7, 0.85)
 outline_size = 2
 outline_color = Color(0, 0, 0, 0.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ca42v"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_bar_active"]
 font_size = 32
@@ -59,7 +161,12 @@ glow_blend_mode = 1
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_uwrxv")
-sword_state_textures = Array[Texture2D]([ExtResource("2_iywne"), ExtResource("3_p57ef"), ExtResource("4_u5sy4"), ExtResource("5_gee14"), ExtResource("6_p57ef")])
+HitFeedbackPopup = ExtResource("2_2o43q")
+fever_gain_perfect = 25.0
+sword_state_textures = Array[Texture2D]([ExtResource("3_g70v4"), ExtResource("4_5s14w"), ExtResource("5_a0n7o"), ExtResource("6_53tq7"), ExtResource("7_v8h6g")])
+
+[node name="Camera2D" type="Camera2D" parent="."]
+anchor_mode = 0
 
 [node name="SwordDisplay" type="Sprite2D" parent="."]
 position = Vector2(150, 211)
@@ -71,6 +178,77 @@ offset_top = 403.0
 offset_right = 880.0
 offset_bottom = 577.0
 color = Color(0.207512, 0.207512, 0.207512, 1)
+
+[node name="TargetFlashes" type="Node2D" parent="."]
+position = Vector2(232, 490)
+
+[node name="FlashTrack1" type="ColorRect" parent="TargetFlashes"]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = -1
+offset_left = -10.0
+offset_top = -57.0
+offset_right = 10.0
+offset_bottom = -37.0
+color = Color(1, 0.843137, 0, 1)
+
+[node name="FlashTrack2" type="ColorRect" parent="TargetFlashes"]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = -1
+offset_left = -10.0
+offset_top = -20.0
+offset_right = 10.0
+offset_bottom = 20.0
+color = Color(1, 0.843137, 0, 1)
+
+[node name="FlashTrack3" type="ColorRect" parent="TargetFlashes"]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = -1
+offset_left = -10.0
+offset_top = 37.0
+offset_right = 10.0
+offset_bottom = 57.0
+color = Color(1, 0.843137, 0, 1)
+
+[node name="HitParticles" type="Node2D" parent="."]
+
+[node name="ParticlesPerfect" type="GPUParticles2D" parent="HitParticles"]
+emitting = false
+amount = 50
+lifetime = 0.8
+one_shot = true
+explosiveness = 0.9
+fract_delta = false
+process_material = SubResource("ParticleProcessMaterial_n1d6u")
+
+[node name="ParticlesEmpowered" type="GPUParticles2D" parent="HitParticles"]
+material = SubResource("CanvasItemMaterial_kpf8d")
+emitting = false
+amount = 150
+lifetime = 1.2
+one_shot = true
+explosiveness = 1.0
+fract_delta = false
+process_material = SubResource("ParticleProcessMaterial_n1d6u")
+
+[node name="ParticlesGood" type="GPUParticles2D" parent="HitParticles"]
+material = SubResource("CanvasItemMaterial_ylb4w")
+emitting = false
+amount = 15
+lifetime = 0.6
+one_shot = true
+explosiveness = 0.8
+fract_delta = false
+process_material = SubResource("ParticleProcessMaterial_k445f")
+
+[node name="ParticlesMiss" type="GPUParticles2D" parent="HitParticles"]
+material = SubResource("CanvasItemMaterial_aeg87")
+emitting = false
+amount = 25
+lifetime = 0.7
+one_shot = true
+explosiveness = 0.7
+fract_delta = false
+process_material = SubResource("ParticleProcessMaterial_j0u6t")
 
 [node name="SpawnPoint" type="Marker2D" parent="."]
 position = Vector2(880, 490)
@@ -119,6 +297,8 @@ vertical_alignment = 1
 
 [node name="UI" type="CanvasLayer" parent="."]
 
+[node name="PopupContainer" type="Node2D" parent="UI"]
+
 [node name="LoopTimeLabel" type="Label" parent="UI"]
 anchors_preset = -1
 anchor_top = 1.0
@@ -161,6 +341,57 @@ offset_bottom = 72.0
 grow_horizontal = 0
 show_percentage = false
 
+[node name="SupernovaFlame" type="AnimatedSprite2D" parent="UI/FeverMeterBar"]
+visible = false
+texture_filter = 1
+material = SubResource("ShaderMaterial_rysoc")
+position = Vector2(425, 14)
+scale = Vector2(4, 4)
+sprite_frames = SubResource("SpriteFrames_v0rfl")
+frame_progress = 0.17090406
+
+[node name="MultiplierTiers" type="HBoxContainer" parent="UI/FeverMeterBar"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 80.0
+offset_right = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 48
+alignment = 1
+
+[node name="Tier2x" type="Label" parent="UI/FeverMeterBar/MultiplierTiers"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "x2"
+
+[node name="Tier4x" type="Label" parent="UI/FeverMeterBar/MultiplierTiers"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "x4"
+
+[node name="Tier8x" type="Label" parent="UI/FeverMeterBar/MultiplierTiers"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "x8"
+
+[node name="Tier16x" type="Label" parent="UI/FeverMeterBar/MultiplierTiers"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "x16"
+
+[node name="Tier32x" type="Label" parent="UI/FeverMeterBar/MultiplierTiers"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "x32"
+
 [node name="TierDisplay" type="VBoxContainer" parent="UI"]
 anchors_preset = -1
 anchor_left = 0.5
@@ -187,6 +418,7 @@ theme_override_constants/separation = 4
 alignment = 1
 
 [node name="LevelBar1" type="Label" parent="UI/TierDisplay/LevelBarsContainer"]
+material = SubResource("ShaderMaterial_ca42v")
 layout_mode = 2
 text = "|"
 label_settings = SubResource("LabelSettings_bar_active")
@@ -234,33 +466,33 @@ environment = SubResource("Environment_p57ef")
 [node name="MusicLayers" type="Node" parent="."]
 
 [node name="MusicLayer1" type="AudioStreamPlayer" parent="MusicLayers"]
-stream = ExtResource("7_gee14")
+stream = ExtResource("8_1n0f8")
 
 [node name="MusicLayer2" type="AudioStreamPlayer" parent="MusicLayers"]
-stream = ExtResource("8_0tnpc")
-volume_db = 11.093
-
-[node name="MusicLayer3" type="AudioStreamPlayer" parent="MusicLayers"]
-stream = ExtResource("8_0tnpc")
+stream = ExtResource("9_v36j1")
 volume_db = 24.0
 pitch_scale = 0.5
+
+[node name="MusicLayer3" type="AudioStreamPlayer" parent="MusicLayers"]
+stream = ExtResource("9_v36j1")
+volume_db = 11.093
 
 [node name="SFX" type="Node" parent="."]
 
 [node name="SfxPerfect" type="AudioStreamPlayer" parent="SFX"]
-stream = ExtResource("9_kvuet")
+stream = ExtResource("10_w0n6e")
 
 [node name="SfxImperfect" type="AudioStreamPlayer" parent="SFX"]
-stream = ExtResource("10_trtic")
+stream = ExtResource("11_h2o8l")
 
 [node name="SfxMiss" type="AudioStreamPlayer" parent="SFX"]
-stream = ExtResource("11_ir15t")
+stream = ExtResource("12_c1042")
 
 [node name="SfxLevelUp" type="AudioStreamPlayer" parent="SFX"]
-stream = ExtResource("12_ca42v")
+stream = ExtResource("13_gpl5b")
 
 [node name="SfxLevelDown" type="AudioStreamPlayer" parent="SFX"]
-stream = ExtResource("13_rysoc")
+stream = ExtResource("14_82vma")
 
 [node name="TransitionFeedbackTimer" type="Timer" parent="."]
 wait_time = 1.5
