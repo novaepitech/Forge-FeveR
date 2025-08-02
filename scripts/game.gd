@@ -1,4 +1,3 @@
-# Forge FeveR/scripts/game.gd
 extends Node2D
 
 # --- Game Parameters ---
@@ -40,6 +39,7 @@ const SUPERNOVA_THRESHOLD: float = 95.0
 @export_group("Feedback Settings")
 @export var shake_strength_perfect: float = 4.0
 @export var shake_strength_empowered: float = 8.0
+@export var shake_fade: float = 10.0
 
 @export_group("Progression System")
 @export var sword_state_textures: Array[Texture2D]
@@ -102,13 +102,16 @@ var _settings_bar_inactive: LabelSettings
 
 var is_supernova_active: bool = false
 var supernova_tween: Tween
-var fever_bar_tween: Tween # <-- ADDED: To manage the bar's animation state
+var fever_bar_tween: Tween
+
+# Screen Shake State
+var shake_strength: float = 0.0
+var rng = RandomNumberGenerator.new()
 
 # --- Node References ---
 @onready var spawn_pos_marker: Marker2D = $SpawnPoint
 @onready var target_pos_marker: Marker2D = $TargetZone
 @onready var score_label: Label = $UI/ScoreLabel
-@onready var multiplier_label: Label = $UI/MultiplierLabel
 @onready var fever_meter_bar: ProgressBar = $UI/FeverMeterBar
 @onready var sword_display: Sprite2D = $SwordDisplay
 @onready var loop_time_label: Label = $UI/LoopTimeLabel
@@ -126,6 +129,7 @@ var fever_bar_tween: Tween # <-- ADDED: To manage the bar's animation state
 
 # --- Feedback Node References ---
 @onready var camera: Camera2D = $Camera2D
+@onready var ui_canvas_layer: CanvasLayer = $UI
 @onready var popup_container: Node2D = $UI/PopupContainer
 @onready var target_flashes: Dictionary = {1: $TargetFlashes/FlashTrack1, 2: $TargetFlashes/FlashTrack2, 3: $TargetFlashes/FlashTrack3}
 @onready var hit_particles: Dictionary = {
@@ -236,6 +240,7 @@ func _process(delta):
 
 	_spawn_notes_from_active_charts()
 	_update_fever_meter_visuals(delta)
+	_process_shake(delta)
 
 
 func _update_fever_meter_visuals(delta: float):
@@ -468,12 +473,8 @@ func _trigger_score_popup(judgment: String, pos: Vector2, score: int, is_empower
 func _trigger_camera_shake(judgment: String, is_empowered_perfect: bool):
 	if judgment != "Perfect": return
 	var strength = shake_strength_empowered if is_empowered_perfect else shake_strength_perfect
-	var duration = 0.2
-	var tween = get_tree().create_tween().set_trans(Tween.TRANS_SINE)
-	tween.tween_property(camera, "offset", Vector2(randf_range(-strength, strength), randf_range(-strength, strength)), duration / 4)
-	tween.tween_property(camera, "offset", Vector2(randf_range(-strength, strength), randf_range(-strength, strength)), duration / 4)
-	tween.tween_property(camera, "offset", Vector2(randf_range(-strength, strength), randf_range(-strength, strength)), duration / 4)
-	tween.tween_property(camera, "offset", Vector2.ZERO, duration / 4)
+	# Set shake strength. Using max prevents a stronger shake from being overridden by a weaker one.
+	shake_strength = max(shake_strength, strength)
 
 func _trigger_target_flash(judgment: String, track_id: int):
 	if not target_flashes.has(track_id): return
@@ -497,6 +498,24 @@ func _trigger_hit_particles(judgment: String, pos: Vector2, is_empowered_perfect
 		var emitter: GPUParticles2D = hit_particles[key]
 		emitter.global_position = pos
 		emitter.restart()
+
+
+# --- Screen Shake Logic ---
+func _process_shake(delta: float) -> void:
+	if shake_strength > 0.01:
+		shake_strength = lerpf(shake_strength, 0, shake_fade * delta)
+		var offset = _random_shake_offset()
+		# Apply the same offset to the camera and the UI layer
+		camera.offset = offset
+		ui_canvas_layer.offset = offset
+	elif camera.offset != Vector2.ZERO: # Executes once when the shake ends
+		shake_strength = 0
+		camera.offset = Vector2.ZERO
+		ui_canvas_layer.offset = Vector2.ZERO
+
+
+func _random_shake_offset() -> Vector2:
+	return Vector2(rng.randf_range(-shake_strength, shake_strength), rng.randf_range(-shake_strength, shake_strength))
 
 
 # --- FEVER METER & MULTIPLIER LOGIC ---
@@ -615,7 +634,6 @@ func _update_tier_ui():
 func _update_ui():
 	if not is_instance_valid(score_label): return
 	score_label.text = "%d" % total_score
-	multiplier_label.text = "x%d" % score_multiplier
 
 func _show_transition_feedback(text: String, color: Color):
 	transition_feedback_label.text = text
