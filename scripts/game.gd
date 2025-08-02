@@ -21,6 +21,17 @@ const EMPOWERED_BONUS: int = 1500
 const EMPOWERED_CHANCE_NEW: float = 0.20
 const EMPOWERED_CHANCE_OLD: float = 0.07
 
+# --- FEVER METER COLOR SYSTEM ---
+# Color progression: x2=Red, x4=Orange, x8=Yellow, x16=Blue, x32=Rose/Purple
+const FEVER_BAR_COLORS = {
+	1: Color.GRAY,           # Base/no multiplier
+	2: Color.RED,           # x2 multiplier
+	4: Color.ORANGE,        # x4 multiplier
+	8: Color(2.168, 1.437, 0.383, 1.0),        # x8 multiplier
+	16: Color.DODGER_BLUE,  # x16 multiplier
+	32: Color.ORCHID        # x32 multiplier (rose/purple)
+}
+
 @export_group("Timing Windows")
 @export var timing_window_perfect: float = 0.04
 @export var timing_window_good: float = 0.08
@@ -198,7 +209,9 @@ func reset_game_state():
 	_update_fever_state()
 	_update_ui()
 
+	# Initialize fever bar color
 	if is_node_ready():
+		fever_meter_bar.modulate = FEVER_BAR_COLORS.get(1, Color.GRAY)
 		_update_music_volume()
 
 
@@ -251,7 +264,6 @@ func _update_fever_meter_visuals(delta: float):
 		var new_fever_value = fever_meter - fever_decay_rate * delta
 		set_fever_meter(new_fever_value, false)
 
-	# --- CORRECTED LINE ---
 	# Only lerp for smooth decay if no "pop" tween is currently active
 	if not (fever_bar_tween and fever_bar_tween.is_valid()):
 		fever_meter_bar.value = lerp(fever_meter_bar.value, fever_meter, delta * fever_bar_lerp_speed)
@@ -539,7 +551,6 @@ func set_fever_meter(value: float, use_tween: bool):
 	fever_meter = clamp(value, FEVER_METER_MIN, FEVER_METER_MAX)
 
 	if use_tween:
-		# --- CORRECTED LOGIC ---
 		# Kill any previous animation to avoid conflicts
 		if fever_bar_tween and fever_bar_tween.is_valid():
 			fever_bar_tween.kill()
@@ -564,11 +575,23 @@ func _update_fever_state():
 
 	if old_multiplier != score_multiplier:
 		_update_multiplier_tier_visuals()
+		_update_fever_bar_color()
 
 	if fever_meter >= SUPERNOVA_THRESHOLD and not is_supernova_active:
 		_activate_supernova(true)
 	elif fever_meter < SUPERNOVA_THRESHOLD and is_supernova_active:
 		_activate_supernova(false)
+
+func _update_fever_bar_color():
+	var target_color = FEVER_BAR_COLORS.get(score_multiplier, Color.GRAY)
+
+	# Create a smooth color transition
+	var color_tween = create_tween()
+	color_tween.tween_method(_set_fever_bar_color, fever_meter_bar.modulate, target_color, 0.3)
+	color_tween.set_ease(Tween.EASE_OUT)
+
+func _set_fever_bar_color(color: Color):
+	fever_meter_bar.modulate = color
 
 func _update_multiplier_tier_visuals():
 	var active_color = Color(1, 0.84, 0.2, 1)
@@ -588,12 +611,17 @@ func _activate_supernova(activate: bool):
 		supernova_flame.play("default")
 		if supernova_tween and supernova_tween.is_valid(): supernova_tween.kill()
 		supernova_tween = create_tween().set_loops()
-		supernova_tween.tween_property(fever_meter_bar, "self_modulate", Color.ORANGE_RED, 0.5).set_trans(Tween.TRANS_SINE)
-		supernova_tween.tween_property(fever_meter_bar, "self_modulate", Color.WHITE, 0.5).set_trans(Tween.TRANS_SINE)
+		# Use the current multiplier color as base for pulsing
+		var base_color = FEVER_BAR_COLORS.get(score_multiplier, Color.ORCHID)
+		var pulse_color = base_color.lightened(0.3)
+		supernova_tween.tween_property(fever_meter_bar, "modulate", pulse_color, 0.5).set_trans(Tween.TRANS_SINE)
+		supernova_tween.tween_property(fever_meter_bar, "modulate", base_color, 0.5).set_trans(Tween.TRANS_SINE)
 	else:
 		supernova_flame.stop()
 		if supernova_tween and supernova_tween.is_valid(): supernova_tween.kill()
-		fever_meter_bar.self_modulate = Color.WHITE
+		# Return to the current multiplier color instead of white
+		var current_color = FEVER_BAR_COLORS.get(score_multiplier, Color.GRAY)
+		fever_meter_bar.modulate = current_color
 
 func calculate_miss_penalty() -> int:
 	if consecutive_misses == 0: return base_miss_penalty
