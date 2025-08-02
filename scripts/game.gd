@@ -1,7 +1,5 @@
 extends Node2D
 
-signal note_judged(judgment: String, track_id: int, score_change: int, is_empowered_perfect: bool)
-
 # --- Game Parameters ---
 const NoteScene = preload("res://scenes/note.tscn")
 @export var lookahead_time: float = 2.0
@@ -396,7 +394,7 @@ func process_player_hit(hit_time: float, track_id: int):
 	if is_empowered_perfect:
 		score_change += EMPOWERED_BONUS
 
-	_on_note_judged(judgment, track_id, score_change, is_empowered_perfect)
+	_on_note_judged(judgment, score_change)
 
 	active_notes.erase(best_note_on_track)
 	best_note_on_track.hit()
@@ -405,10 +403,10 @@ func process_player_hit(hit_time: float, track_id: int):
 func _on_note_missed(note_missed: Node):
 	if active_notes.has(note_missed):
 		active_notes.erase(note_missed)
-	_on_note_judged("Miss", note_missed.track_id, 0, false)
+	_on_note_judged("Miss", 0)
 
 
-func _on_note_judged(judgment: String, track_id: int, score_change: int, is_empowered_perfect: bool):
+func _on_note_judged(judgment: String, score_change: int):
 	match judgment:
 		"Perfect":
 			notes_hit_in_current_loop += 1
