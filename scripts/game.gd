@@ -36,33 +36,43 @@ const FEVER_METER_MAX: float = 100.0
 @export var score_checkpoints: Array[int] = [100000, 600000, 800000]
 
 # The game will combine charts from level 0 up to the current level.
+# Charts are timed for 160 BPM (0.375s per beat, 1.5s per 4/4 measure).
 var all_charts: Dictionary = {
-	# Level 0 (Base rhythm - only the base music track plays)
+	# Level 0 (Easiest: One note every two measures, on the downbeat)
 	0: [
-		{"time": 2.0, "track": 1}, {"time": 3.5, "track": 2}, {"time": 5.0, "track": 3},
-		{"time": 6.5, "track": 1}, {"time": 8.0, "track": 2}, {"time": 9.5, "track": 3},
-		{"time": 11.0, "track": 1}, {"time": 12.5, "track": 2}, {"time": 14.0, "track": 3},
-		{"time": 15.5, "track": 2}
+		{"time": 2.0, "track": 1},
+		{"time": 5.0, "track": 2},
+		{"time": 8.0, "track": 1},
+		{"time": 11.0, "track": 2},
+		{"time": 14.0, "track": 1},
+		{"time": 17.0, "track": 2}
 	],
-	# Level 1 (Adds the first layer of complexity/music)
+	# Level 1 (Fills in the other downbeats for a one-note-per-measure feel)
 	1: [
-		{"time": 1.0, "track": 1}, {"time": 3.0, "track": 3}, {"time": 4.0, "track": 1},
-		{"time": 4.5, "track": 2}, {"time": 6.0, "track": 3}, {"time": 7.0, "track": 2},
-		{"time": 8.5, "track": 2}, {"time": 9.0, "track": 3}, {"time": 10.0, "track": 2},
-		{"time": 12.0, "track": 3}, {"time": 13.0, "track": 1}, {"time": 15.0, "track": 3},
-		{"time": 16.0, "track": 1}, {"time": 16.5, "track": 2}
+		{"time": 3.5, "track": 3},
+		{"time": 6.5, "track": 1},
+		{"time": 9.5, "track": 3},
+		{"time": 12.5, "track": 1},
+		{"time": 15.5, "track": 3},
+		{"time": 18.5, "track": 1}
 	],
-	# Level 2 (Adds the second layer of complexity/music)
+	# Level 2 (Adds notes on the 3rd beat of each measure - a simple quarter-note pulse)
 	2: [
-		{"time": 1.5, "track": 1}, {"time": 2.75, "track": 3}, {"time": 4.25, "track": 1},
-		{"time": 5.5, "track": 2}, {"time": 8.25, "track": 2}, {"time": 8.75, "track": 1},
-		{"time": 10.5, "track": 1}, {"time": 11.75, "track": 1}, {"time": 13.25, "track": 3}
+		{"time": 2.75, "track": 2},
+		{"time": 5.75, "track": 1},
+		{"time": 8.75, "track": 3},
+		{"time": 11.75, "track": 1},
+		{"time": 14.75, "track": 2},
+		{"time": 17.75, "track": 3}
 	],
-	# Level 3 (Adds final layer of complexity/music)
+	# Level 3 (Adds a few extra quarter notes and two simple eighth-note flourishes)
 	3: [
-		{"time": 5.0, "track": 1}, {"time": 6.5, "track": 3}, {"time": 7.0, "track": 3},
-		{"time": 8.0, "track": 1}, {"time": 8.5, "track": 3}, {"time": 9.0, "track": 2},
-		{"time": 14.5, "track": 2}, {"time": 16.0, "track": 2}
+		{"time": 4.25, "track": 2},  # Quarter note
+		{"time": 5.375, "track": 1}, # Eighth note after 5.0 note
+		{"time": 10.25, "track": 2}, # Quarter note
+		{"time": 14.375, "track": 1},# Eighth note after 14.0 note
+		{"time": 16.25, "track": 3}, # Quarter note
+		{"time": 19.25, "track": 2}  # Quarter note
 	]
 }
 
