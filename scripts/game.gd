@@ -241,7 +241,7 @@ func _evaluate_performance():
 
 	var old_next_level = next_level
 
-	if success_rate >= 1.0:
+	if success_rate >= 0.95:
 		next_level = min(current_level + 1, MAX_LEVEL)
 		print("EVAL: LEVEL UP! (100%)")
 	elif success_rate >= 0.8:
