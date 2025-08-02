@@ -393,7 +393,7 @@ func _process_judgment(judgment: String, note: Node, miss_track_id: int = -1):
 		score_change = SCORE_VALUES["Perfect"] + EMPOWERED_BONUS
 	else:
 		score_change = SCORE_VALUES.get(judgment, 0)
-	
+
 	_trigger_all_feedback(judgment, track_id, position, is_empowered_perfect, score_change)
 
 	match judgment:
@@ -462,7 +462,7 @@ func _trigger_score_popup(judgment: String, pos: Vector2, score: int, is_empower
 			text = "MISS\n-%d" % penalty
 			color = Color.INDIAN_RED
 			font_size = 28
-	
+
 	popup.setup(text, color, font_size, is_empowered_perfect)
 
 func _trigger_camera_shake(judgment: String, is_empowered_perfect: bool):
@@ -478,7 +478,7 @@ func _trigger_camera_shake(judgment: String, is_empowered_perfect: bool):
 func _trigger_target_flash(judgment: String, track_id: int):
 	if not target_flashes.has(track_id): return
 	var flash_rect: ColorRect = target_flashes[track_id]
-	
+
 	var color: Color
 	match judgment:
 		"Perfect": color = Color.GOLD
@@ -502,13 +502,13 @@ func _trigger_hit_particles(judgment: String, pos: Vector2, is_empowered_perfect
 # --- FEVER METER & MULTIPLIER LOGIC ---
 func set_fever_meter(value: float, use_tween: bool):
 	fever_meter = clamp(value, FEVER_METER_MIN, FEVER_METER_MAX)
-	
+
 	if use_tween:
 		# --- CORRECTED LOGIC ---
 		# Kill any previous animation to avoid conflicts
 		if fever_bar_tween and fever_bar_tween.is_valid():
 			fever_bar_tween.kill()
-		
+
 		# Create a new tween and store its reference
 		fever_bar_tween = create_tween()
 		fever_bar_tween.tween_property(fever_meter_bar, "value", fever_meter, 0.15).set_ease(Tween.EASE_OUT)
@@ -538,7 +538,7 @@ func _update_fever_state():
 func _update_multiplier_tier_visuals():
 	var active_color = Color(1, 0.84, 0.2, 1)
 	var inactive_color = Color(0.4, 0.4, 0.4, 1)
-	
+
 	for tier_value in multiplier_tier_labels:
 		var label = multiplier_tier_labels[tier_value]
 		if score_multiplier >= tier_value:
@@ -562,7 +562,8 @@ func _activate_supernova(activate: bool):
 
 func calculate_miss_penalty() -> int:
 	if consecutive_misses == 0: return base_miss_penalty
-	return base_miss_penalty * (2 ** (consecutive_misses - 1))
+	var penalty = base_miss_penalty * (2 ** (consecutive_misses - 1))
+	return min(penalty, 32000)  # Cap the penalty at 32000
 
 func _update_progression():
 	var potential_tier_idx = 0; var potential_level_idx = 0; var found_level = false
