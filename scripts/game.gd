@@ -19,8 +19,8 @@ const EVALUATION_TIME: float = 21.0
 # --- Scoring & Empowered Notes Parameters ---
 const SCORE_VALUES = { "Perfect": 1000, "Good": 250, "OK": 50, "Miss": 0 }
 const EMPOWERED_BONUS: int = 1500
-const EMPOWERED_CHANCE_NEW: float = 0.15   # 15% chance for notes of the current level
-const EMPOWERED_CHANCE_OLD: float = 0.02   # 2% chance for notes of previous levels
+const EMPOWERED_CHANCE_NEW: float = 0.20   # 20% chance for notes of the current level
+const EMPOWERED_CHANCE_OLD: float = 0.07   # 7% chance for notes of previous levels
 
 @export_group("Timing Windows")
 @export var timing_window_perfect: float = 0.04
