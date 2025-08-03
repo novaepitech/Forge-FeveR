@@ -93,7 +93,9 @@ var all_charts: Dictionary = {
 	0: [{"time": 0.0, "track": 1}, {"time": 3.0, "track": 2}, {"time": 6.0, "track": 1}, {"time": 9.0, "track": 2}, {"time": 12.0, "track": 1}, {"time": 15.0, "track": 2}, {"time": 17.0, "track": 3}, {"time": 19.0, "track": 2}],
 	1: [{"time": 3.5, "track": 3}, {"time": 6.5, "track": 1}, {"time": 9.5, "track": 3}, {"time": 12.5, "track": 1}, {"time": 15.5, "track": 3}, {"time": 18.5, "track": 1}],
 	2: [{"time": 2.75, "track": 2}, {"time": 5.75, "track": 1}, {"time": 8.75, "track": 3}, {"time": 11.75, "track": 1}, {"time": 14.75, "track": 2}, {"time": 17.75, "track": 3}],
-	3: [{"time": 4.25, "track": 2}, {"time": 5.375, "track": 1}, {"time": 10.25, "track": 2}, {"time": 14.375, "track": 1}, {"time": 16.25, "track": 3}, {"time": 19.25, "track": 2}]
+	3: [{"time": 4.25, "track": 2}, {"time": 5.375, "track": 1}, {"time": 10.25, "track": 2}, {"time": 14.375, "track": 1}, {"time": 16.25, "track": 3}, {"time": 19.25, "track": 2}],
+	4: [{"time": 4.75, "track": 2}, {"time": 14.25, "track": 2}],
+	5: [{"time": 16.75, "track": 3}, {"time": 8.375, "track": 2}]
 }
 
 # --- Game State Variables ---
@@ -155,7 +157,14 @@ var rng = RandomNumberGenerator.new()
 
 @onready var screen_flash: ColorRect = $ScreenFlash
 
-@onready var music_layers: Dictionary = {0: $MusicLayers/MusicLayer1, 1: $MusicLayers/MusicLayer2, 2: $MusicLayers/MusicLayer3}
+@onready var music_layers: Dictionary = {
+	0: $MusicLayers/MusicLayerBase,
+	1: $MusicLayers/MusicLayer1,
+	2: $MusicLayers/MusicLayer2,
+	3: $MusicLayers/MusicLayer3,
+	4: $MusicLayers/MusicLayer4,
+	5: $MusicLayers/MusicLayer5
+}
 @onready var sfx_perfect: AudioStreamPlayer = $SFX/SfxPerfect
 @onready var sfx_imperfect: AudioStreamPlayer = $SFX/SfxImperfect
 @onready var sfx_miss: AudioStreamPlayer = $SFX/SfxMiss
