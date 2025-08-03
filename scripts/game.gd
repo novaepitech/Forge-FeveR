@@ -1,6 +1,7 @@
 extends Node2D
 
 # --- Game Parameters ---
+const EndScreenScene = preload("res://scenes/end_screen.tscn")
 const NoteScene = preload("res://scenes/note.tscn")
 @export var HitFeedbackPopup: PackedScene
 @export var lookahead_time: float = 2.0
@@ -96,6 +97,7 @@ var all_charts: Dictionary = {
 }
 
 # --- Game State Variables ---
+var is_game_over: bool = false
 var track_icons: Dictionary
 var MAX_LEVEL: int
 var song_position: float = 0.0
@@ -151,6 +153,8 @@ var rng = RandomNumberGenerator.new()
 @onready var background: AnimatedSprite2D = $Background
 @onready var background_glow: AnimatedSprite2D = $BackgroundGlow
 
+@onready var screen_flash: ColorRect = $ScreenFlash
+
 @onready var music_layers: Dictionary = {0: $MusicLayers/MusicLayer1, 1: $MusicLayers/MusicLayer2, 2: $MusicLayers/MusicLayer3}
 @onready var sfx_perfect: AudioStreamPlayer = $SFX/SfxPerfect
 @onready var sfx_imperfect: AudioStreamPlayer = $SFX/SfxImperfect
@@ -194,8 +198,14 @@ func _capture_ui_styles():
 
 
 func reset_game_state():
+	is_game_over = false
+	set_process(true)
+
 	if is_node_ready():
 		for player in music_layers.values(): player.stop()
+		$UI.show()
+		if is_instance_valid(screen_flash):
+			screen_flash.modulate.a = 0.0
 
 	music_started = false
 	active_music_level = 0
@@ -265,6 +275,8 @@ func _update_music_volume():
 
 
 func _process(delta):
+	if is_game_over: return
+
 	song_position += delta
 
 	if not music_started and song_position >= 0.0:
@@ -300,6 +312,10 @@ func _end_of_loop_procedure():
 		success_rate = float(notes_hit_in_current_loop) / float(notes_in_current_loop)
 	else:
 		success_rate = 1.0
+
+	if current_level == MAX_LEVEL and success_rate >= 0.80:
+		end_game() # Le jeu est terminé !
+		return
 
 	var old_level_for_sfx_check = next_level
 	if success_rate >= 0.90:
@@ -407,6 +423,8 @@ func spawn_note(target_time: float, track_id: int, note_level: int):
 
 
 func _unhandled_input(_event: InputEvent):
+	if is_game_over: return
+
 	if song_position < -timing_window_ok: return
 
 	var hit_time = song_position
@@ -504,6 +522,62 @@ func _sync_music_on_hit():
 	active_music_level = current_level
 	_update_music_volume()
 	is_awaiting_level_sync_hit = false
+
+
+# Séquence principale de fin de partie.
+func end_game():
+	if is_game_over: return # Empêche les appels multiples.
+	is_game_over = true
+
+	# 1. Arrêt du gameplay.
+	set_process(false) # Arrête la boucle _process.
+
+	# 2. Gestion de l'audio.
+	for player in music_layers.values():
+		player.stop()
+	# Joue un son de victoire (remplacez par un son dédié si disponible).
+	sfx_level_up.play()
+
+	# 3. Masquage de l'interface de jeu.
+	$UI.hide()
+
+	# C. Lancement de l'effet de transition visuelle.
+	# "await" met en pause la fonction jusqu'à la fin de l'animation.
+	await _play_end_game_animation()
+
+	# 4. Préparation et affichage de l'écran de fin.
+	var end_screen_instance = EndScreenScene.instantiate()
+
+	# 5. Connexion au signal de redémarrage AVANT d'ajouter à la scène.
+	end_screen_instance.restart_game_requested.connect(_on_restart_requested)
+
+	add_child(end_screen_instance)
+
+	# Transfère les données finales à l'écran de fin.
+	var final_sword_texture = sword_display.texture
+	var final_tier_name = progression_data[current_tier_index]["name"]
+	end_screen_instance.set_results(total_score, final_sword_texture, final_tier_name)
+
+
+# Gère le redémarrage du jeu lorsque le signal est reçu.
+func _on_restart_requested():
+	get_tree().reload_current_scene()
+
+
+# Anime le flash visuel de transition.
+func _play_end_game_animation() -> void:
+	var tween = create_tween()
+	tween.set_parallel(false) # Les animations se suivront.
+
+	# Flash intense.
+	tween.tween_property(screen_flash, "modulate:a", 1.0, 0.2).set_ease(Tween.EASE_IN)
+	# Maintient le flash un court instant.
+	tween.tween_interval(0.1)
+	# Fondu au noir (en diminuant l'alpha du flash blanc).
+	tween.tween_property(screen_flash, "modulate:a", 0.0, 0.8).set_ease(Tween.EASE_OUT)
+
+	# Attend que toute l'animation soit terminée.
+	await tween.finished
 
 
 # --- SENSORY FEEDBACK SUB-SYSTEMS ---

@@ -1,0 +1,82 @@
+[gd_scene load_steps=5 format=3 uid="uid://c6f2xqwli6n8k"]
+
+[ext_resource type="Script" path="res://scripts/end_screen.gd" id="1_xcyk5"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1v8de"]
+bg_color = Color(0.121569, 0.121569, 0.141176, 0.854902)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.729412, 0.729412, 0.729412, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.345098)
+shadow_size = 5
+
+[sub_resource type="LabelSettings" id="LabelSettings_t3c3r"]
+font_size = 36
+font_color = Color(0.941176, 0.941176, 0.941176, 1)
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 0.490196)
+
+[sub_resource type="LabelSettings" id="LabelSettings_25awo"]
+font_size = 28
+font_color = Color(0.819608, 0.843137, 0.952941, 1)
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[node name="EndScreen" type="CanvasLayer"]
+script = ExtResource("1_xcyk5")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -300.0
+offset_right = 280.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1v8de")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="TierNameLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "PALIER : ACIER"
+label_settings = SubResource("LabelSettings_25awo")
+horizontal_alignment = 1
+
+[node name="SwordTextureRect" type="TextureRect" parent="PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 256)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="FinalScoreLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Score: 999999"
+label_settings = SubResource("LabelSettings_t3c3r")
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+text = "Relancer la forge"

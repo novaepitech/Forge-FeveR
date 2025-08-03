@@ -685,4 +685,10 @@ stream = ExtResource("14_82vma")
 wait_time = 1.5
 one_shot = true
 
+[node name="ScreenFlash" type="ColorRect" parent="."]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = -1
+offset_right = 1152.0
+offset_bottom = 648.0
+
 [connection signal="timeout" from="TransitionFeedbackTimer" to="." method="_on_transition_feedback_timer_timeout"]
