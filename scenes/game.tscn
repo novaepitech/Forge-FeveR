@@ -496,7 +496,7 @@ texture = ExtResource("14_js0lu")
 
 [node name="SwordDisplay" type="Sprite2D" parent="Swords"]
 texture_filter = 1
-position = Vector2(576, 324)
+position = Vector2(576, 345)
 scale = Vector2(0.3, 0.3)
 
 [node name="Tracks" type="Node" parent="."]
@@ -573,6 +573,7 @@ emitting = false
 amount = 150
 lifetime = 1.2
 one_shot = true
+explosiveness = 1.0
 fract_delta = false
 process_material = SubResource("ParticleProcessMaterial_n1d6u")
 
@@ -659,9 +660,9 @@ label_settings = SubResource("LabelSettings_04n7w")
 [node name="ScoreLabel" type="Label" parent="UI"]
 anchors_preset = -1
 offset_left = 119.0
-offset_top = 480.0
+offset_top = 503.0
 offset_right = 240.0
-offset_bottom = 526.0
+offset_bottom = 549.0
 text = "0"
 label_settings = SubResource("LabelSettings_04n7w")
 horizontal_alignment = 1
@@ -738,9 +739,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -448.0
-offset_top = -249.0
+offset_top = -267.0
 offset_right = -348.0
-offset_bottom = -177.0
+offset_bottom = -195.0
 grow_horizontal = 2
 grow_vertical = 2
 alignment = 1

@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://c6f2xqwli6n8k"]
 
-[ext_resource type="Script" path="res://scripts/end_screen.gd" id="1_xcyk5"]
+[ext_resource type="Script" uid="uid://cmaefhk2j1242" path="res://scripts/end_screen.gd" id="1_xcyk5"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1v8de"]
 bg_color = Color(0.121569, 0.121569, 0.141176, 0.854902)
@@ -16,6 +16,12 @@ corner_radius_bottom_left = 12
 shadow_color = Color(0, 0, 0, 0.345098)
 shadow_size = 5
 
+[sub_resource type="LabelSettings" id="LabelSettings_25awo"]
+font_size = 28
+font_color = Color(0.819608, 0.843137, 0.952941, 1)
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
 [sub_resource type="LabelSettings" id="LabelSettings_t3c3r"]
 font_size = 36
 font_color = Color(0.941176, 0.941176, 0.941176, 1)
@@ -24,17 +30,11 @@ outline_color = Color(0, 0, 0, 1)
 shadow_size = 3
 shadow_color = Color(0, 0, 0, 0.490196)
 
-[sub_resource type="LabelSettings" id="LabelSettings_25awo"]
-font_size = 28
-font_color = Color(0.819608, 0.843137, 0.952941, 1)
-outline_size = 3
-outline_color = Color(0, 0, 0, 1)
-
 [node name="EndScreen" type="CanvasLayer"]
 script = ExtResource("1_xcyk5")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-anchors_preset = 8
+anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -79,4 +79,4 @@ custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 32
-text = "Relancer la forge"
+text = "Restart the Forge"

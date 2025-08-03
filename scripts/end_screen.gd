@@ -23,7 +23,7 @@ func _ready():
 func set_results(final_score: int, sword_texture: Texture2D, tier_name: String):
 	final_score_label.text = "Score: %d" % final_score
 	sword_texture_rect.texture = sword_texture
-	tier_name_label.text = "Palier: %s" % tier_name.to_upper()
+	tier_name_label.text = "Tier: %s" % tier_name.to_upper()
 
 ## Fonction privée qui gère le clic sur le bouton.
 ## Elle ne fait qu'émettre le signal restart_game_requested, que la scène principale du jeu (game.tscn) écoutera.
