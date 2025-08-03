@@ -90,12 +90,32 @@ const SUPERNOVA_THRESHOLD: float = 95.0
 ]
 
 var all_charts: Dictionary = {
-	0: [{"time": 0.0, "track": 1}, {"time": 3.0, "track": 2}, {"time": 6.0, "track": 1}, {"time": 9.0, "track": 2}, {"time": 12.0, "track": 1}, {"time": 15.0, "track": 2}, {"time": 17.0, "track": 3}, {"time": 19.0, "track": 2}],
-	1: [{"time": 3.5, "track": 3}, {"time": 6.5, "track": 1}, {"time": 9.5, "track": 3}, {"time": 12.5, "track": 1}, {"time": 15.5, "track": 3}, {"time": 18.5, "track": 1}],
-	2: [{"time": 2.75, "track": 2}, {"time": 5.75, "track": 1}, {"time": 8.75, "track": 3}, {"time": 11.75, "track": 1}, {"time": 14.75, "track": 2}, {"time": 17.75, "track": 3}],
-	3: [{"time": 4.25, "track": 2}, {"time": 5.375, "track": 1}, {"time": 10.25, "track": 2}, {"time": 14.375, "track": 1}, {"time": 16.25, "track": 3}, {"time": 19.25, "track": 2}],
-	4: [{"time": 4.75, "track": 2}, {"time": 14.25, "track": 2}],
-	5: [{"time": 16.75, "track": 3}, {"time": 8.375, "track": 2}]
+	0: [{"time": 0.0, "track": 1},
+		{"time": 3.0, "track": 2},
+		{"time": 6.0, "track": 1},
+		{"time": 9.0, "track": 1},
+		{"time": 12.0, "track": 1},
+		{"time": 15.0, "track": 1},
+		{"time": 18.0, "track": 1},
+		{"time": 21.0, "track": 2}],
+	1: [{"time": 0.375, "track": 3},
+		{"time": 1.875, "track": 2},
+		{"time": 3.375, "track": 1},
+		{"time": 12.375, "track": 1},
+		{"time": 13.875, "track": 2},
+		{"time": 15.375, "track": 3}],
+	2: [{"time": 1.5, "track": 3},
+		{"time": 7.5, "track": 1},
+		{"time": 10.5, "track": 3}],
+	3: [{"time": 3.5, "track": 3},
+		{"time": 6.5, "track": 1},
+		{"time": 9.5, "track": 3}],
+	4: [{"time": 3.5, "track": 3},
+		{"time": 6.5, "track": 1},
+		{"time": 9.5, "track": 3}],
+	5: [{"time": 4.5, "track": 3},
+		{"time": 13.5, "track": 1},
+		{"time": 16.5, "track": 1}],
 }
 
 # --- Game State Variables ---
