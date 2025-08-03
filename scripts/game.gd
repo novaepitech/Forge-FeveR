@@ -150,6 +150,8 @@ var rng = RandomNumberGenerator.new()
 @onready var loop_time_label: Label = $UI/LoopTimeLabel
 @onready var transition_feedback_label: Label = $UI/TransitionFeedbackLabel
 @onready var transition_feedback_timer: Timer = $TransitionFeedbackTimer
+@onready var missed_notes_label: Label = $UI/MissedNotesLabel
+@onready var missed_notes_timer: Timer = $MissedNotesTimer
 @onready var tier_name_label: Label = $UI/TierDisplay/TierNameLabel
 @onready var level_bars: Array[Label] = [$UI/TierDisplay/LevelBarsContainer/LevelBar1, $UI/TierDisplay/LevelBarsContainer/LevelBar2, $UI/TierDisplay/LevelBarsContainer/LevelBar3]
 @onready var background: AnimatedSprite2D = $Background
@@ -321,6 +323,10 @@ func _end_of_loop_procedure():
 		success_rate = float(notes_hit_in_current_loop) / float(notes_in_current_loop)
 	else:
 		success_rate = 1.0
+
+	# Calculate and display the number of missed notes from the loop that just ended.
+	var missed_notes = notes_in_current_loop - notes_hit_in_current_loop
+	_show_miss_feedback(missed_notes)
 
 	if current_level == MAX_LEVEL and success_rate >= 0.80:
 		end_game() # Le jeu est terminé !
@@ -856,3 +862,21 @@ func _show_transition_feedback(text: String, color: Color):
 
 func _on_transition_feedback_timer_timeout():
 	transition_feedback_label.visible = false
+
+# Shows a message indicating how many notes were missed in the last loop.
+func _show_miss_feedback(miss_count: int):
+	if miss_count == 0:
+		# If no notes were missed, show a special message.
+		missed_notes_label.text = "Perfect Loop!"
+		missed_notes_label.modulate = Color.GOLD # Use a distinct color for praise.
+	else:
+		# Otherwise, show the number of missed notes.
+		var s = "s" if miss_count > 1 else "" # Handle plural "note(s)".
+		missed_notes_label.text = "You missed %d note%s." % [miss_count, s]
+
+	missed_notes_label.visible = true
+	missed_notes_timer.start()
+
+# Hides the missed notes label after the timer finishes.
+func _on_missed_notes_timer_timeout():
+	missed_notes_label.visible = false
