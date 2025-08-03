@@ -137,6 +137,7 @@ var supernova_tween: Tween
 var fever_bar_tween: Tween
 var is_background_animating: bool = false
 
+var countdown_value: int = 4 # Will tick down 3, 2, 1, FORGE!
 # Screen Shake State
 var shake_strength: float = 0.0
 var rng = RandomNumberGenerator.new()
@@ -149,6 +150,8 @@ var rng = RandomNumberGenerator.new()
 @onready var sword_display: Sprite2D = $SwordDisplay
 @onready var loop_time_label: Label = $UI/LoopTimeLabel
 @onready var transition_feedback_label: Label = $UI/TransitionFeedbackLabel
+@onready var countdown_label: Label = $UI/CountdownLabel
+@onready var countdown_timer: Timer = $CountdownTimer
 @onready var transition_feedback_timer: Timer = $TransitionFeedbackTimer
 @onready var missed_notes_label: Label = $UI/MissedNotesLabel
 @onready var missed_notes_timer: Timer = $MissedNotesTimer
@@ -197,20 +200,23 @@ func _ready():
 		2: furnace_icon,
 		3: blow_icon
 	}
-	reset_game_state()
+	# Keep all game logic paused until countdown is finished
+	set_process(false)
+	set_process_unhandled_input(false)
+
+	# Prepare game state in the background
+	reset_game_state() # This now only resets variables
 	_initialize_audio()
+
+	# Start the pre-game countdown
+	_start_countdown()
+
 	# Ensure the glow layer is transparent at the start
 	background_glow.modulate.a = 0.0
 
 
-func _capture_ui_styles():
-	_settings_bar_active = level_bars[0].label_settings
-	_settings_bar_inactive = level_bars[1].label_settings
-
-
 func reset_game_state():
 	is_game_over = false
-	set_process(true)
 
 	if is_node_ready():
 		for player in music_layers.values(): player.stop()
@@ -259,6 +265,40 @@ func reset_game_state():
 	if is_node_ready():
 		fever_meter_bar.modulate = FEVER_BAR_COLORS.get(1, Color.GRAY)
 		_update_music_volume()
+
+
+func _start_countdown():
+	countdown_label.visible = true
+	_update_countdown_and_proceed()
+
+# The function connected to the CountdownTimer's timeout signal
+func _on_countdown_timer_timeout():
+	_update_countdown_and_proceed()
+
+func _update_countdown_and_proceed():
+	countdown_value -= 1
+
+	if countdown_value > 0:
+		countdown_label.text = str(countdown_value)
+		countdown_timer.start() # Start timer for the next second
+	elif countdown_value == 0:
+		countdown_label.text = "FORGE!"
+		countdown_timer.start() # Start timer for the final "FORGE!" display
+		# Optional: Add a visual effect for "FORGE!"
+		var tween = create_tween()
+		tween.tween_property(countdown_label, "scale", Vector2(1.2, 1.2), 0.1)
+		tween.tween_property(countdown_label, "scale", Vector2(1, 1), 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BOUNCE)
+	else:
+		# Countdown is finished, start the game
+		countdown_label.visible = false
+		set_process(true)
+		set_process_unhandled_input(true)
+		# The game's _process loop will now take over
+
+
+func _capture_ui_styles():
+	_settings_bar_active = level_bars[0].label_settings
+	_settings_bar_inactive = level_bars[1].label_settings
 
 
 func _initialize_audio():
