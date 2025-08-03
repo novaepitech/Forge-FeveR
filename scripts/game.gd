@@ -440,7 +440,6 @@ func _process_judgment(judgment: String, note: Node, miss_track_id: int = -1):
 			consecutive_perfects = 0
 			set_fever_meter(FEVER_METER_MIN, true)
 			consecutive_misses += 1
-			score_multiplier = 1
 			sfx_miss.play()
 			if is_awaiting_level_sync_hit: is_awaiting_level_sync_hit = false
 
@@ -599,15 +598,34 @@ func _set_fever_bar_color(color: Color):
 	fever_meter_bar.modulate = color
 
 func _update_multiplier_tier_visuals():
-	var active_color = Color(1, 0.84, 0.2, 1)
-	var inactive_color = Color(0.4, 0.4, 0.4, 1)
+	var active_color = Color.WHITE
+	var surpassed_color = Color(0.8, 0.8, 0.8, 1.0)
+	var inactive_color = Color(0.4, 0.4, 0.4, 1.0)
+	var outline_color = Color(0, 0, 0, 0.9)
 
 	for tier_value in multiplier_tier_labels:
-		var label = multiplier_tier_labels[tier_value]
-		if score_multiplier >= tier_value:
-			label.modulate = active_color
+		var label: Label = multiplier_tier_labels[tier_value]
+
+		# First, remove modulation so our color overrides work as expected.
+		label.modulate = Color.WHITE
+		# Then, apply the theme overrides for color and outline.
+		label.add_theme_color_override("outline_color", outline_color)
+
+		if score_multiplier == tier_value:
+			# Current active tier: White, large font, thick outline
+			label.add_theme_color_override("font_color", active_color)
+			label.add_theme_font_size_override("font_size", 28)
+			label.add_theme_constant_override("outline_size", 6)
+		elif score_multiplier > tier_value:
+			# Surpassed tiers: Light gray, regular font, medium outline
+			label.add_theme_color_override("font_color", surpassed_color)
+			label.add_theme_font_size_override("font_size", 20)
+			label.add_theme_constant_override("outline_size", 4)
 		else:
-			label.modulate = inactive_color
+			# Inactive/unreached tiers: Dark gray, regular font, subtle outline
+			label.add_theme_color_override("font_color", inactive_color)
+			label.add_theme_font_size_override("font_size", 20)
+			label.add_theme_constant_override("outline_size", 4)
 
 func _activate_supernova(activate: bool):
 	is_supernova_active = activate

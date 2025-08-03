@@ -372,40 +372,35 @@ alignment = 1
 [node name="Tier32x" type="Label" parent="UI/FeverMeterBar/MultiplierTiers"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "x32"
 vertical_alignment = 1
 
 [node name="Tier16x" type="Label" parent="UI/FeverMeterBar/MultiplierTiers"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "x16"
 vertical_alignment = 1
 
 [node name="Tier8x" type="Label" parent="UI/FeverMeterBar/MultiplierTiers"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "x8"
 vertical_alignment = 1
 
 [node name="Tier4x" type="Label" parent="UI/FeverMeterBar/MultiplierTiers"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "x4"
 vertical_alignment = 1
 
 [node name="Tier2x" type="Label" parent="UI/FeverMeterBar/MultiplierTiers"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "x2"
 vertical_alignment = 1
 
