@@ -142,6 +142,16 @@ var countdown_value: int = 4 # Will tick down 3, 2, 1, FORGE!
 var shake_strength: float = 0.0
 var rng = RandomNumberGenerator.new()
 
+# --- Tutorial State ---
+var is_in_tutorial: bool = true
+var tutorial_step: int = 0
+var tutorial_messages: Array[String] = [
+	"Welcome to Forge FeveR!\n\nYour goal is to strike in rhythm with the music to forge the most powerful sword imaginable.",
+	"Notes will scroll from right to left on three tracks. Hit the correct key when a note reaches the target zone on the left.\n\n- Top Track: [ I ]\n- Middle Track: [ J ]\n- Bottom Track: [ N ]",
+	"Timing is everything! 'Perfect' hits build your Fever Meter, which unlocks powerful score multipliers. Missing a note will reset your meter and your multiplier!",
+	"Your performance in each musical loop determines the difficulty. Score over 90% to level up and add new layers to the music. Score below 80% and you'll be knocked down a level.\n\nReady to light the forge?"
+]
+
 # --- Node References ---
 @onready var spawn_pos_marker: Marker2D = $SpawnPoint
 @onready var target_pos_marker: Marker2D = $TargetZone
@@ -159,6 +169,11 @@ var rng = RandomNumberGenerator.new()
 @onready var level_bars: Array[Label] = [$UI/TierDisplay/LevelBarsContainer/LevelBar1, $UI/TierDisplay/LevelBarsContainer/LevelBar2, $UI/TierDisplay/LevelBarsContainer/LevelBar3]
 @onready var background: AnimatedSprite2D = $Background
 @onready var background_glow: AnimatedSprite2D = $BackgroundGlow
+
+# --- Tutorial Node References ---
+@onready var tutorial_layer: CanvasLayer = $TutorialLayer
+@onready var tutorial_label: Label = $TutorialLayer/PanelContainer/VBoxContainer/TutorialLabel
+@onready var tutorial_button: Button = $TutorialLayer/PanelContainer/VBoxContainer/TutorialButton
 
 @onready var screen_flash: ColorRect = $ScreenFlash
 
@@ -200,20 +215,58 @@ func _ready():
 		2: furnace_icon,
 		3: blow_icon
 	}
-	# Keep all game logic paused until countdown is finished
-	set_process(false)
-	set_process_unhandled_input(false)
 
 	# Prepare game state in the background
-	reset_game_state() # This now only resets variables
+	reset_game_state()
 	_initialize_audio()
 
-	# Start the pre-game countdown
-	_start_countdown()
+	# Start the tutorial instead of the game
+	_start_tutorial()
 
 	# Ensure the glow layer is transparent at the start
 	background_glow.modulate.a = 0.0
 
+
+# --- TUTORIAL LOGIC ---
+func _start_tutorial():
+	# Pause the game tree so _process and animations stop.
+	get_tree().paused = true
+	is_in_tutorial = true
+	tutorial_step = 0
+
+	# Show tutorial UI
+	tutorial_layer.visible = true
+
+	_update_tutorial_display()
+
+func _update_tutorial_display():
+	tutorial_label.text = tutorial_messages[tutorial_step]
+	if tutorial_step == tutorial_messages.size() - 1:
+		tutorial_button.text = "Start Forging!"
+	else:
+		tutorial_button.text = "Next"
+
+func _on_tutorial_button_pressed():
+	tutorial_step += 1
+	if tutorial_step >= tutorial_messages.size():
+		_end_tutorial_and_start_game()
+	else:
+		_update_tutorial_display()
+
+func _end_tutorial_and_start_game():
+	is_in_tutorial = false
+	tutorial_layer.visible = false
+
+	# Unpause the game so timers and _process can run.
+	get_tree().paused = false
+
+	# Keep main game logic paused until countdown finishes
+	set_process(false)
+	set_process_unhandled_input(false)
+
+	# Start the pre-game countdown
+	_start_countdown()
+# --- END TUTORIAL LOGIC ---
 
 func reset_game_state():
 	is_game_over = false

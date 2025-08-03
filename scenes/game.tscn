@@ -1,6 +1,6 @@
-[gd_scene load_steps=75 format=3 uid="uid://b3pm2nt526yr7"]
+[gd_scene load_steps=79 format=3 uid="uid://b3pm2nt526yr7"]
 
-[ext_resource type="Script" uid="uid://bh6srqu5h8vbj" path="res://scripts/game.gd" id="1_uwrxv"]
+[ext_resource type="Script" path="res://scripts/game.gd" id="1_uwrxv"]
 [ext_resource type="PackedScene" uid="uid://c5q0aax10g47x" path="res://scenes/hit_feedback_popup.tscn" id="2_2o43q"]
 [ext_resource type="Texture2D" uid="uid://dwhrlub4ioujq" path="res://assets/icons/hit.png" id="3_1kice"]
 [ext_resource type="Texture2D" uid="uid://dmxnq7ayv2sey" path="res://assets/icons/furnace.png" id="4_5newe"]
@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://cjbmgr7vt3hyf" path="res://assets/sprites/swords/sword_level_1.png" id="7_m4url"]
 [ext_resource type="AudioStream" uid="uid://di1w5iy6cbu8o" path="res://assets/musics/base.mp3" id="8_1n0f8"]
 [ext_resource type="Texture2D" uid="uid://dqxrrslbmdp0i" path="res://assets/sprites/swords/sword_level_2.png" id="8_8ool0"]
-[ext_resource type="Shader" uid="uid://dpiypedu682bu" path="res://shaders/glow.gdshader" id="8_ca42v"]
+[ext_resource type="Shader" path="res://shaders/glow.gdshader" id="8_ca42v"]
 [ext_resource type="Texture2D" uid="uid://umook1nc0r3r" path="res://assets/sprites/FireBall/Sheets/IdleLoop-Sheet.png" id="8_ir15t"]
 [ext_resource type="Texture2D" uid="uid://op2x2wg67pe3" path="res://assets/sprites/background_spritesheet.png" id="8_rysoc"]
 [ext_resource type="Texture2D" uid="uid://non8hfff5x17" path="res://assets/sprites/swords/sword_level_3.png" id="9_pr1ej"]
@@ -193,8 +193,8 @@ animations = [{
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ssvqc"]
 shader = ExtResource("8_ca42v")
-shader_parameter/glow_color = Color(0.837305, 0.53313285, 0, 1)
-shader_parameter/glow_power = 4.0000000596048
+shader_parameter/glow_color = Color(0.837305, 0.533133, 0, 1)
+shader_parameter/glow_power = 4.0
 shader_parameter/glow_shift = 1.0
 shader_parameter/glow_radius = 1.0
 
@@ -266,9 +266,9 @@ font_size = 32
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rysoc"]
 shader = ExtResource("8_ca42v")
-shader_parameter/glow_color = Color(1, 0.7977378, 0.48452926, 1)
-shader_parameter/glow_power = 3.0000000447036
-shader_parameter/glow_shift = 0.60000000894072
+shader_parameter/glow_color = Color(1, 0.797738, 0.484529, 1)
+shader_parameter/glow_power = 3.0
+shader_parameter/glow_shift = 0.6
 shader_parameter/glow_radius = 4.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ca42v"]
@@ -327,6 +327,54 @@ font_size = 32
 font_color = Color(0.45, 0.45, 0.45, 0.7)
 outline_size = 1
 outline_color = Color(0, 0, 0, 0.3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f1v5h"]
+bg_color = Color(0.121569, 0.121569, 0.141176, 0.862745)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.635294, 0.427451, 0.215686, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4q1t6"]
+bg_color = Color(0.2, 0.12549, 0.0509804, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.635294, 0.427451, 0.215686, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ycyjc"]
+bg_color = Color(0.4, 0.25098, 0.14902, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.635294, 0.427451, 0.215686, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_08pqq"]
+bg_color = Color(0.298039, 0.184314, 0.0980392, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.635294, 0.427451, 0.215686, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="Environment" id="Environment_p57ef"]
 background_mode = 3
@@ -460,35 +508,31 @@ scale = Vector2(0.3, 0.3)
 [node name="Tracks" type="Node" parent="."]
 
 [node name="Track1" type="ColorRect" parent="Tracks"]
-anchors_preset = -1
 offset_left = 385.0
 offset_top = 434.0
 offset_right = 1152.0
 offset_bottom = 450.0
-color = Color(0.20906562, 0.20906562, 0.20906562, 0.5)
+color = Color(0.209066, 0.209066, 0.209066, 0.5)
 
 [node name="Track2" type="ColorRect" parent="Tracks"]
-anchors_preset = -1
 offset_left = 385.0
 offset_top = 484.0
 offset_right = 1152.0
 offset_bottom = 500.0
-color = Color(0.20906562, 0.20906562, 0.20906562, 0.5)
+color = Color(0.209066, 0.209066, 0.209066, 0.5)
 
 [node name="Track3" type="ColorRect" parent="Tracks"]
-anchors_preset = -1
 offset_left = 385.0
 offset_top = 533.0
 offset_right = 1152.0
 offset_bottom = 549.0
-color = Color(0.20906562, 0.20906562, 0.20906562, 0.5)
+color = Color(0.209066, 0.209066, 0.209066, 0.5)
 
 [node name="TargetFlashes" type="Node2D" parent="."]
 position = Vector2(359, 490)
 
 [node name="FlashTrack1" type="ColorRect" parent="TargetFlashes"]
 modulate = Color(1, 1, 1, 0)
-anchors_preset = -1
 offset_left = -10.0
 offset_top = -57.0
 offset_right = 10.0
@@ -497,7 +541,6 @@ color = Color(1, 0.843137, 0, 1)
 
 [node name="FlashTrack2" type="ColorRect" parent="TargetFlashes"]
 modulate = Color(1, 1, 1, 0)
-anchors_preset = -1
 offset_left = -10.0
 offset_top = -20.0
 offset_right = 10.0
@@ -506,7 +549,6 @@ color = Color(1, 0.843137, 0, 1)
 
 [node name="FlashTrack3" type="ColorRect" parent="TargetFlashes"]
 modulate = Color(1, 1, 1, 0)
-anchors_preset = -1
 offset_left = -10.0
 offset_top = 37.0
 offset_right = 10.0
@@ -519,41 +561,40 @@ color = Color(1, 0.843137, 0, 1)
 material = SubResource("ShaderMaterial_ssvqc")
 emitting = false
 amount = 50
+process_material = SubResource("ParticleProcessMaterial_n1d6u")
 lifetime = 0.8
 one_shot = true
 explosiveness = 0.9
 fract_delta = false
-process_material = SubResource("ParticleProcessMaterial_n1d6u")
 
 [node name="ParticlesEmpowered" type="GPUParticles2D" parent="HitParticles"]
 material = SubResource("ShaderMaterial_ssvqc")
 emitting = false
 amount = 150
+process_material = SubResource("ParticleProcessMaterial_n1d6u")
 lifetime = 1.2
 one_shot = true
-explosiveness = 1.0
 fract_delta = false
-process_material = SubResource("ParticleProcessMaterial_n1d6u")
 
 [node name="ParticlesGood" type="GPUParticles2D" parent="HitParticles"]
 material = SubResource("CanvasItemMaterial_ylb4w")
 emitting = false
 amount = 15
+process_material = SubResource("ParticleProcessMaterial_k445f")
 lifetime = 0.6
 one_shot = true
 explosiveness = 0.8
 fract_delta = false
-process_material = SubResource("ParticleProcessMaterial_k445f")
 
 [node name="ParticlesMiss" type="GPUParticles2D" parent="HitParticles"]
 material = SubResource("CanvasItemMaterial_aeg87")
 emitting = false
 amount = 25
+process_material = SubResource("ParticleProcessMaterial_j0u6t")
 lifetime = 0.7
 one_shot = true
 explosiveness = 0.7
 fract_delta = false
-process_material = SubResource("ParticleProcessMaterial_j0u6t")
 
 [node name="SpawnPoint" type="Marker2D" parent="."]
 position = Vector2(1190, 490)
@@ -562,7 +603,6 @@ position = Vector2(1190, 490)
 position = Vector2(359, 490)
 
 [node name="HintI" type="Label" parent="."]
-anchors_preset = -1
 offset_left = 335.0
 offset_top = 416.0
 offset_right = 385.0
@@ -575,7 +615,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="HintJ" type="Label" parent="."]
-anchors_preset = -1
 offset_left = 335.0
 offset_top = 466.0
 offset_right = 385.0
@@ -588,7 +627,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="HintN" type="Label" parent="."]
-anchors_preset = -1
 offset_left = 335.0
 offset_top = 516.0
 offset_right = 385.0
@@ -606,27 +644,24 @@ vertical_alignment = 1
 
 [node name="LoopTimeLabel" type="Label" parent="UI"]
 visible = false
-anchors_preset = -1
-anchor_top = 1.0
-anchor_bottom = 1.0
 offset_top = -45.0
 offset_right = 311.0
+anchor_top = 1.0
+anchor_bottom = 1.0
 grow_vertical = 0
 text = "[DEBUG] Loop: 0.00s"
 label_settings = SubResource("LabelSettings_04n7w")
 
 [node name="ScoreLabel" type="Label" parent="UI"]
-anchors_preset = -1
 offset_left = 119.0
 offset_top = 480.0
-offset_right = 240.00009
+offset_right = 240.0
 offset_bottom = 526.0
 text = "0"
 label_settings = SubResource("LabelSettings_04n7w")
 horizontal_alignment = 1
 
 [node name="FeverMeterBar" type="ProgressBar" parent="UI"]
-anchors_preset = -1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -72.0
@@ -644,7 +679,7 @@ material = SubResource("ShaderMaterial_rysoc")
 position = Vector2(13.5, -15)
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_v0rfl")
-frame_progress = 0.2651414
+frame_progress = 0.265141
 
 [node name="MultiplierTiers" type="VBoxContainer" parent="UI/FeverMeterBar"]
 layout_mode = 1
@@ -691,7 +726,6 @@ text = "x2"
 vertical_alignment = 1
 
 [node name="TierDisplay" type="VBoxContainer" parent="UI"]
-anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -739,7 +773,6 @@ vertical_alignment = 1
 
 [node name="TransitionFeedbackLabel" type="Label" parent="UI"]
 visible = false
-anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -760,7 +793,6 @@ vertical_alignment = 1
 
 [node name="MissedNotesLabel" type="Label" parent="UI"]
 visible = false
-anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -778,7 +810,6 @@ vertical_alignment = 1
 
 [node name="CountdownLabel" type="Label" parent="UI"]
 visible = false
-anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -842,7 +873,6 @@ one_shot = true
 
 [node name="ScreenFlash" type="ColorRect" parent="."]
 modulate = Color(1, 1, 1, 0)
-anchors_preset = -1
 offset_right = 1152.0
 offset_bottom = 648.0
 
@@ -850,6 +880,52 @@ offset_bottom = 648.0
 wait_time = 1.5
 one_shot = true
 
+[node name="TutorialLayer" type="CanvasLayer" parent="."]
+process_mode = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="TutorialLayer"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -200.0
+offset_right = 350.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+theme_override_styles/panel = SubResource("StyleBoxFlat_f1v5h")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TutorialLayer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="TutorialLabel" type="Label" parent="TutorialLayer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.929412, 0.929412, 0.929412, 1)
+theme_override_font_sizes/font_size = 20
+text = "Tutorial text goes here..."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="TutorialButton" type="Button" parent="TutorialLayer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_08pqq")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ycyjc")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_4q1t6")
+text = "Next"
+
 [connection signal="timeout" from="CountdownTimer" to="." method="_on_countdown_timer_timeout"]
 [connection signal="timeout" from="TransitionFeedbackTimer" to="." method="_on_transition_feedback_timer_timeout"]
 [connection signal="timeout" from="MissedNotesTimer" to="." method="_on_missed_notes_timer_timeout"]
+[connection signal="pressed" from="TutorialLayer/PanelContainer/VBoxContainer/TutorialButton" to="." method="_on_tutorial_button_pressed"]
