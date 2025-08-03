@@ -9,6 +9,7 @@ size = Vector2(70, 40)
 script = ExtResource("1_doocs")
 
 [node name="ColorRect" type="ColorRect" parent="."]
+visible = false
 z_index = 1
 anchors_preset = -1
 anchor_left = 0.5
@@ -24,6 +25,7 @@ grow_vertical = 2
 color = Color(0.0509804, 1, 1, 1)
 
 [node name="ColorRect2" type="ColorRect" parent="."]
+visible = false
 show_behind_parent = true
 z_index = 1
 anchors_preset = -1
@@ -38,6 +40,10 @@ offset_bottom = 23.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+z_index = 1
+scale = Vector2(0.08, 0.08)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_wn01w")

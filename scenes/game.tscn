@@ -1,9 +1,12 @@
-[gd_scene load_steps=53 format=3 uid="uid://b3pm2nt526yr7"]
+[gd_scene load_steps=56 format=3 uid="uid://b3pm2nt526yr7"]
 
 [ext_resource type="Script" uid="uid://bh6srqu5h8vbj" path="res://scripts/game.gd" id="1_uwrxv"]
 [ext_resource type="PackedScene" uid="uid://c5q0aax10g47x" path="res://scenes/hit_feedback_popup.tscn" id="2_2o43q"]
+[ext_resource type="Texture2D" uid="uid://dwhrlub4ioujq" path="res://assets/icons/hit.png" id="3_1kice"]
 [ext_resource type="Texture2D" uid="uid://pdscnrc6xxkt" path="res://assets/sprites/swords/sword_level_0.webp" id="3_g70v4"]
+[ext_resource type="Texture2D" uid="uid://dmxnq7ayv2sey" path="res://assets/icons/furnace.png" id="4_5newe"]
 [ext_resource type="Texture2D" uid="uid://cjw0i32mrl7kj" path="res://assets/sprites/swords/sword_level_1.webp" id="4_5s14w"]
+[ext_resource type="Texture2D" uid="uid://hj5y3s0tgv7s" path="res://assets/icons/blow.png" id="5_37s47"]
 [ext_resource type="Texture2D" uid="uid://cgsvm8ifylrqq" path="res://assets/sprites/swords/sword_level_2.webp" id="5_a0n7o"]
 [ext_resource type="Texture2D" uid="uid://coqrcxpsgupww" path="res://assets/sprites/swords/sword_level_3.webp" id="6_53tq7"]
 [ext_resource type="Texture2D" uid="uid://6vb5rv88veow" path="res://assets/sprites/swords/sword_level_4.webp" id="7_v8h6g"]
@@ -314,6 +317,9 @@ glow_blend_mode = 1
 [node name="Game" type="Node2D"]
 script = ExtResource("1_uwrxv")
 HitFeedbackPopup = ExtResource("2_2o43q")
+hit_icon = ExtResource("3_1kice")
+furnace_icon = ExtResource("4_5newe")
+blow_icon = ExtResource("5_37s47")
 sword_state_textures = Array[Texture2D]([ExtResource("3_g70v4"), ExtResource("4_5s14w"), ExtResource("5_a0n7o"), ExtResource("6_53tq7"), ExtResource("7_v8h6g")])
 
 [node name="Background" type="AnimatedSprite2D" parent="."]

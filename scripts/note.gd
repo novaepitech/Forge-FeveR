@@ -1,51 +1,45 @@
-extends Area2D
+extends Node2D
 
 signal missed
 
-@onready var color_rect: ColorRect = $ColorRect
+var target_time: float
+var track_id: int
+var is_empowered: bool
+var speed: float
 
-var target_time: float = 0.0
-var game_node
-var spawn_position: Vector2
-var target_position: Vector2
-var track_id: int = 0
-var is_empowered: bool = false
-var is_hit: bool = false
+var game_logic: Node
+var target_x_pos: float
 
-func setup(p_target_time: float, p_game_node, p_spawn_pos: Vector2, p_target_pos: Vector2, p_track_id: int, p_is_empowered: bool):
-	self.target_time = p_target_time
-	self.game_node = p_game_node
-	self.spawn_position = p_spawn_pos
-	self.target_position = p_target_pos
-	self.global_position = spawn_position
-	self.track_id = p_track_id
-	self.is_empowered = p_is_empowered
+@onready var sprite: Sprite2D = $Sprite2D
 
-	if is_empowered:
-		color_rect.color = Color.GOLD
+func _process(delta: float):
+	position.x -= speed * delta
 
-func _process(_delta: float):
-	if not is_instance_valid(game_node) or is_hit:
-		return
-
-	var current_song_time = game_node.song_position
-	var lookahead = game_node.lookahead_time
-	var spawn_time = target_time - lookahead
-
-	if current_song_time < spawn_time:
-		self.visible = false
-		return
-
-	self.visible = true
-
-	var progress = (current_song_time - spawn_time) / lookahead
-	self.global_position = spawn_position.lerp(target_position, progress)
-
-	if current_song_time > target_time + game_node.timing_window_ok:
-		is_hit = true
-		emit_signal("missed", self) # Pass self in signal
+	if position.x < target_x_pos - 50:
+		missed.emit(self)
 		queue_free()
 
+func setup(p_target_time: float, p_game_logic: Node, p_start_pos: Vector2, p_end_pos: Vector2, p_track_id: int, p_is_empowered: bool, icon_texture: Texture2D):
+	target_time = p_target_time
+	position = p_start_pos
+	track_id = p_track_id
+	is_empowered = p_is_empowered
+
+	game_logic = p_game_logic
+	target_x_pos = p_end_pos.x
+
+	if sprite and icon_texture:
+		sprite.texture = icon_texture
+
+	if is_empowered:
+		self.modulate = Color.GOLD
+		self.scale = Vector2(1.2, 1.2)
+
+	var distance = p_start_pos.x - p_end_pos.x
+	# Use the stored game_logic reference to access lookahead_time
+	var time_to_travel = game_logic.lookahead_time
+	if time_to_travel > 0:
+		speed = distance / time_to_travel
+
 func hit():
-	is_hit = true
 	queue_free()

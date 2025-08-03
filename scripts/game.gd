@@ -7,6 +7,12 @@ const NoteScene = preload("res://scenes/note.tscn")
 @export var track_y_positions: Array[float] = [440.0, 490.0, 540.0]
 @export var initial_delay: float = 2.0
 
+@export_group("Note Icons")
+@export var hit_icon: Texture2D
+@export var furnace_icon: Texture2D
+@export var blow_icon: Texture2D
+
+
 # --- Audio Parameters ---
 const VOLUME_AUDIBLE_DB: float = 0.0
 const VOLUME_MUTED_DB: float = -80.0
@@ -90,6 +96,7 @@ var all_charts: Dictionary = {
 }
 
 # --- Game State Variables ---
+var track_icons: Dictionary
 var MAX_LEVEL: int
 var song_position: float = 0.0
 var active_notes: Array[Node] = []
@@ -170,6 +177,11 @@ var rng = RandomNumberGenerator.new()
 func _ready():
 	MAX_LEVEL = all_charts.keys().max()
 	_capture_ui_styles()
+	track_icons = {
+		1: hit_icon,
+		2: furnace_icon,
+		3: blow_icon
+	}
 	reset_game_state()
 	_initialize_audio()
 	# Ensure the glow layer is transparent at the start
@@ -384,7 +396,12 @@ func spawn_note(target_time: float, track_id: int, note_level: int):
 	var y_pos = track_y_positions[track_id - 1]
 	var spawn_for_track = Vector2(spawn_pos_marker.global_position.x, y_pos)
 	var target_for_track = Vector2(target_pos_marker.global_position.x, y_pos)
-	note_instance.setup(target_time, self, spawn_for_track, target_for_track, track_id, is_empowered)
+
+	# Get the correct icon for the track
+	var icon_texture = track_icons.get(track_id)
+	# Call setup with the new icon_texture argument
+	note_instance.setup(target_time, self, spawn_for_track, target_for_track, track_id, is_empowered, icon_texture)
+
 	active_notes.append(note_instance)
 	note_instance.missed.connect(_on_note_missed)
 
