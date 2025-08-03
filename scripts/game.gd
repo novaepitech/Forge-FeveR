@@ -363,6 +363,22 @@ func spawn_note(target_time: float, track_id: int, note_level: int):
 	if randf() < chance:
 		is_empowered = true
 
+	var base_anim_name = ANIMATION_MAP.get(track_id)
+	if base_anim_name:
+		var frames = background.sprite_frames
+		var anim_speed = frames.get_animation_speed(base_anim_name)
+
+		var frame_count = frames.get_frame_count(base_anim_name)
+
+		if anim_speed > 0:
+			var pre_glow_duration = float(frame_count) / anim_speed
+			var animation_start_time = target_time - pre_glow_duration
+			var time_until_start = animation_start_time - song_position
+
+			if time_until_start > 0:
+				var timer = get_tree().create_timer(time_until_start)
+				timer.timeout.connect(_play_background_animation.bind(track_id))
+
 	var note_instance = NoteScene.instantiate()
 	add_child(note_instance)
 	var y_pos = track_y_positions[track_id - 1]
@@ -419,9 +435,6 @@ func _process_judgment(judgment: String, note: Node, miss_track_id: int = -1):
 	var track_id = note.track_id if note else miss_track_id
 	var position = note.global_position if note else Vector2(target_pos_marker.global_position.x, track_y_positions[track_id - 1])
 	var is_empowered = note.is_empowered if note else false
-
-	if judgment != "Miss" and track_id > 0:
-		_play_background_animation(track_id)
 
 	var score_change = 0
 	var is_empowered_perfect = (judgment == "Perfect" and is_empowered)
