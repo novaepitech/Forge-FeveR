@@ -39,6 +39,7 @@ const FEVER_BAR_COLORS = {
 
 @export_group("Fever Meter Settings")
 @export var fever_gain_perfect: float = 10.0
+@export var fever_gain_empowered_perfect: float = 20.0
 @export var fever_penalty_imperfect: float = 5.0
 @export var fever_decay_rate: float = 2.5
 @export var fever_bar_lerp_speed: float = 8.0 # Speed for smooth visual decay
@@ -420,7 +421,11 @@ func _process_judgment(judgment: String, note: Node, miss_track_id: int = -1):
 		"Perfect":
 			notes_hit_in_current_loop += 1
 			consecutive_perfects += 1
-			set_fever_meter(fever_meter + fever_gain_perfect, true)
+
+			# Use different fever gain based on whether it's an empowered perfect
+			var fever_gain = fever_gain_empowered_perfect if is_empowered_perfect else fever_gain_perfect
+			set_fever_meter(fever_meter + fever_gain, true)
+
 			consecutive_misses = 0
 			sfx_perfect.play()
 			if is_awaiting_level_sync_hit: _sync_music_on_hit()
