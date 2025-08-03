@@ -1,29 +1,44 @@
-[gd_scene load_steps=60 format=3 uid="uid://b3pm2nt526yr7"]
+[gd_scene load_steps=75 format=3 uid="uid://b3pm2nt526yr7"]
 
 [ext_resource type="Script" uid="uid://bh6srqu5h8vbj" path="res://scripts/game.gd" id="1_uwrxv"]
 [ext_resource type="PackedScene" uid="uid://c5q0aax10g47x" path="res://scenes/hit_feedback_popup.tscn" id="2_2o43q"]
 [ext_resource type="Texture2D" uid="uid://dwhrlub4ioujq" path="res://assets/icons/hit.png" id="3_1kice"]
-[ext_resource type="Texture2D" uid="uid://pdscnrc6xxkt" path="res://assets/sprites/swords/sword_level_0.webp" id="3_g70v4"]
 [ext_resource type="Texture2D" uid="uid://dmxnq7ayv2sey" path="res://assets/icons/furnace.png" id="4_5newe"]
-[ext_resource type="Texture2D" uid="uid://cjw0i32mrl7kj" path="res://assets/sprites/swords/sword_level_1.webp" id="4_5s14w"]
 [ext_resource type="Texture2D" uid="uid://hj5y3s0tgv7s" path="res://assets/icons/blow.png" id="5_37s47"]
-[ext_resource type="Texture2D" uid="uid://cgsvm8ifylrqq" path="res://assets/sprites/swords/sword_level_2.webp" id="5_a0n7o"]
-[ext_resource type="Texture2D" uid="uid://coqrcxpsgupww" path="res://assets/sprites/swords/sword_level_3.webp" id="6_53tq7"]
-[ext_resource type="Texture2D" uid="uid://6vb5rv88veow" path="res://assets/sprites/swords/sword_level_4.webp" id="7_v8h6g"]
+[ext_resource type="Texture2D" uid="uid://dteh5amv6dtjd" path="res://assets/sprites/swords/sword_level_0.png" id="6_7025r"]
+[ext_resource type="Texture2D" uid="uid://cjbmgr7vt3hyf" path="res://assets/sprites/swords/sword_level_1.png" id="7_m4url"]
 [ext_resource type="AudioStream" uid="uid://di1w5iy6cbu8o" path="res://assets/musics/base.mp3" id="8_1n0f8"]
+[ext_resource type="Texture2D" uid="uid://dqxrrslbmdp0i" path="res://assets/sprites/swords/sword_level_2.png" id="8_8ool0"]
 [ext_resource type="Shader" uid="uid://dpiypedu682bu" path="res://shaders/glow.gdshader" id="8_ca42v"]
 [ext_resource type="Texture2D" uid="uid://umook1nc0r3r" path="res://assets/sprites/FireBall/Sheets/IdleLoop-Sheet.png" id="8_ir15t"]
 [ext_resource type="Texture2D" uid="uid://op2x2wg67pe3" path="res://assets/sprites/background_spritesheet.png" id="8_rysoc"]
+[ext_resource type="Texture2D" uid="uid://non8hfff5x17" path="res://assets/sprites/swords/sword_level_3.png" id="9_pr1ej"]
 [ext_resource type="AudioStream" uid="uid://cbjex6cmtwjjt" path="res://assets/musics/level_1.mp3" id="9_v36j1"]
+[ext_resource type="Texture2D" uid="uid://dgsgoq3nsycli" path="res://assets/sprites/swords/sword_level_4.png" id="10_05nbr"]
 [ext_resource type="AudioStream" uid="uid://cnw7vabx6gcb2" path="res://assets/sounds/perfect.mp3" id="10_w0n6e"]
+[ext_resource type="Texture2D" uid="uid://fe1q2v2x5l4u" path="res://assets/sprites/swords/sword_level_5.png" id="11_0sl42"]
 [ext_resource type="AudioStream" uid="uid://bqw1wfhtkablf" path="res://assets/sounds/imperfect.mp3" id="11_h2o8l"]
 [ext_resource type="AudioStream" uid="uid://crkw3aqfafr2a" path="res://assets/sounds/miss.mp3" id="12_c1042"]
+[ext_resource type="Texture2D" uid="uid://d3b5yucqx67ed" path="res://assets/sprites/swords/sword_level_6.png" id="12_oaba0"]
+[ext_resource type="Texture2D" uid="uid://cwr4dhj0d3rfd" path="res://assets/sprites/swords/sword_level_7.png" id="13_458eo"]
 [ext_resource type="AudioStream" uid="uid://cn6mp6onl0vc7" path="res://assets/sounds/level_up.mp3" id="13_gpl5b"]
 [ext_resource type="AudioStream" uid="uid://buiwqcrj4oo2g" path="res://assets/sounds/level_down.mp3" id="14_82vma"]
+[ext_resource type="Texture2D" uid="uid://x300se8iw4oa" path="res://assets/sprites/swords/sword_level_8.png" id="14_h3rex"]
+[ext_resource type="Texture2D" uid="uid://vxmgbl2x2kp7" path="res://assets/sprites/swords/panel.png" id="14_js0lu"]
+[ext_resource type="Texture2D" uid="uid://cwcj6u2g00bds" path="res://assets/sprites/swords/sword_level_9.png" id="15_fedci"]
 [ext_resource type="AudioStream" uid="uid://dlf34hws4h2yi" path="res://assets/musics/level_2.mp3" id="16_5newe"]
+[ext_resource type="Texture2D" uid="uid://dj07i80lvkmb5" path="res://assets/sprites/swords/sword_level_10.png" id="16_8qswn"]
 [ext_resource type="AudioStream" uid="uid://btt5d26c5dsec" path="res://assets/musics/level_3.mp3" id="17_e1j6l"]
+[ext_resource type="Texture2D" uid="uid://bloj4aqgk1hbu" path="res://assets/sprites/swords/sword_level_11.png" id="17_rm0al"]
+[ext_resource type="Texture2D" uid="uid://buh1lkx7byiqy" path="res://assets/sprites/swords/sword_level_12.png" id="18_i4re6"]
 [ext_resource type="AudioStream" uid="uid://cod6yjjh44xdl" path="res://assets/musics/level_4.mp3" id="18_pl11u"]
 [ext_resource type="AudioStream" uid="uid://dn28yca5dnqcc" path="res://assets/musics/level_5.mp3" id="19_bhx41"]
+[ext_resource type="Texture2D" uid="uid://bpng56vrdt3vy" path="res://assets/sprites/swords/sword_level_13.png" id="19_pf7vy"]
+[ext_resource type="Texture2D" uid="uid://bn0ufxaspk18q" path="res://assets/sprites/swords/sword_level_14.png" id="20_o8ni1"]
+[ext_resource type="Texture2D" uid="uid://cyaanoey7en7k" path="res://assets/sprites/swords/sword_level_15.png" id="21_3hbvx"]
+[ext_resource type="Texture2D" uid="uid://841ylfpm4d6s" path="res://assets/sprites/swords/sword_level_16.png" id="22_q8j3a"]
+[ext_resource type="Texture2D" uid="uid://3x6tm6dolpgx" path="res://assets/sprites/swords/sword_level_17.png" id="23_ms3bu"]
+[ext_resource type="Texture2D" uid="uid://dlw5wrk110ax3" path="res://assets/sprites/swords/sword_level_18.png" id="24_7ixpq"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_y0upk"]
 atlas = ExtResource("8_rysoc")
@@ -324,7 +339,92 @@ HitFeedbackPopup = ExtResource("2_2o43q")
 hit_icon = ExtResource("3_1kice")
 furnace_icon = ExtResource("4_5newe")
 blow_icon = ExtResource("5_37s47")
-sword_state_textures = Array[Texture2D]([ExtResource("3_g70v4"), ExtResource("4_5s14w"), ExtResource("5_a0n7o"), ExtResource("6_53tq7"), ExtResource("7_v8h6g")])
+sword_state_textures = Array[Texture2D]([ExtResource("6_7025r"), ExtResource("7_m4url"), ExtResource("8_8ool0"), ExtResource("9_pr1ej"), ExtResource("10_05nbr"), ExtResource("11_0sl42"), ExtResource("12_oaba0"), ExtResource("13_458eo"), ExtResource("14_h3rex"), ExtResource("15_fedci"), ExtResource("16_8qswn"), ExtResource("17_rm0al"), ExtResource("18_i4re6"), ExtResource("19_pf7vy"), ExtResource("20_o8ni1"), ExtResource("21_3hbvx"), ExtResource("22_q8j3a"), ExtResource("23_ms3bu"), ExtResource("24_7ixpq")])
+progression_data = Array[Dictionary]([{
+"levels": [{
+"score_threshold": 0,
+"texture_index": 0
+}, {
+"score_threshold": 65000,
+"texture_index": 1
+}, {
+"score_threshold": 150000,
+"texture_index": 2
+}],
+"name": "BRONZE"
+}, {
+"levels": [{
+"score_threshold": 450000,
+"texture_index": 3
+}, {
+"score_threshold": 900000,
+"texture_index": 4
+}, {
+"score_threshold": 1600000,
+"texture_index": 5
+}],
+"name": "SILVER"
+}, {
+"levels": [{
+"score_threshold": 1800000,
+"texture_index": 6
+}, {
+"score_threshold": 2000000,
+"texture_index": 7
+}, {
+"score_threshold": 2200000,
+"texture_index": 8
+}],
+"name": "GOLD"
+}, {
+"levels": [{
+"score_threshold": 2400000,
+"texture_index": 9
+}, {
+"score_threshold": 2600000,
+"texture_index": 10
+}, {
+"score_threshold": 2800000,
+"texture_index": 11
+}],
+"name": "PLATINUM"
+}, {
+"levels": [{
+"score_threshold": 3000000,
+"texture_index": 12
+}, {
+"score_threshold": 3200000,
+"texture_index": 13
+}, {
+"score_threshold": 3400000,
+"texture_index": 14
+}],
+"name": "DIAMOND"
+}, {
+"levels": [{
+"score_threshold": 3600000,
+"texture_index": 15
+}, {
+"score_threshold": 3800000,
+"texture_index": 16
+}, {
+"score_threshold": 4000000,
+"texture_index": 17
+}],
+"name": "EVIL"
+}, {
+"levels": [{
+"score_threshold": 4200000,
+"texture_index": 18
+}, {
+"score_threshold": 4400000,
+"texture_index": 19
+}, {
+"score_threshold": 4600000,
+"texture_index": 20
+}],
+"name": "HOLY"
+}])
 
 [node name="Background" type="AnimatedSprite2D" parent="."]
 z_index = -2
@@ -345,10 +445,17 @@ autoplay = "idle"
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
 
-[node name="SwordDisplay" type="Sprite2D" parent="."]
+[node name="Swords" type="Node2D" parent="."]
+
+[node name="Panel" type="Sprite2D" parent="Swords"]
+position = Vector2(576, 324)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("14_js0lu")
+
+[node name="SwordDisplay" type="Sprite2D" parent="Swords"]
 texture_filter = 1
-position = Vector2(150, 308)
-scale = Vector2(1, 1.3)
+position = Vector2(576, 324)
+scale = Vector2(0.3, 0.3)
 
 [node name="Tracks" type="Node" parent="."]
 
@@ -510,10 +617,10 @@ label_settings = SubResource("LabelSettings_04n7w")
 
 [node name="ScoreLabel" type="Label" parent="UI"]
 anchors_preset = -1
-offset_left = 94.0
-offset_top = 445.0
-offset_right = 215.0
-offset_bottom = 491.0
+offset_left = 119.0
+offset_top = 480.0
+offset_right = 240.00009
+offset_bottom = 526.0
 text = "0"
 label_settings = SubResource("LabelSettings_04n7w")
 horizontal_alignment = 1
@@ -589,17 +696,17 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -474.0
-offset_top = -227.0
-offset_right = -374.0
-offset_bottom = -155.0
+offset_left = -448.0
+offset_top = -249.0
+offset_right = -348.0
+offset_bottom = -177.0
 grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
 [node name="TierNameLabel" type="Label" parent="UI/TierDisplay"]
 layout_mode = 2
-text = "SCRAP"
+text = "BRONZE"
 label_settings = SubResource("LabelSettings_tier_name")
 horizontal_alignment = 1
 
@@ -671,7 +778,7 @@ vertical_alignment = 1
 
 [node name="CountdownLabel" type="Label" parent="UI"]
 visible = false
-anchors_preset = 8
+anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -727,7 +834,6 @@ stream = ExtResource("13_gpl5b")
 stream = ExtResource("14_82vma")
 
 [node name="CountdownTimer" type="Timer" parent="."]
-wait_time = 1.0
 one_shot = true
 
 [node name="TransitionFeedbackTimer" type="Timer" parent="."]
