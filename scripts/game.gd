@@ -205,8 +205,15 @@ var tutorial_messages: Array[String] = [
 	4: $MusicLayers/MusicLayer4,
 	5: $MusicLayers/MusicLayer5
 }
-@onready var sfx_perfect: AudioStreamPlayer = $SFX/SfxPerfect
-@onready var sfx_imperfect: AudioStreamPlayer = $SFX/SfxImperfect
+
+# --- SFX Node References ---
+var sfx_map: Dictionary = {}
+@onready var sfx_perfect_hit: AudioStreamPlayer = $SFX/SfxPerfectHit
+@onready var sfx_imperfect_hit: AudioStreamPlayer = $SFX/SfxImperfectHit
+@onready var sfx_perfect_furnace: AudioStreamPlayer = $SFX/SfxPerfectFurnace
+@onready var sfx_imperfect_furnace: AudioStreamPlayer = $SFX/SfxImperfectFurnace
+@onready var sfx_perfect_blow: AudioStreamPlayer = $SFX/SfxPerfectBlow
+@onready var sfx_imperfect_blow: AudioStreamPlayer = $SFX/SfxImperfectBlow
 @onready var sfx_miss: AudioStreamPlayer = $SFX/SfxMiss
 @onready var sfx_level_up: AudioStreamPlayer = $SFX/SfxLevelUp
 @onready var sfx_level_down: AudioStreamPlayer = $SFX/SfxLevelDown
@@ -239,12 +246,29 @@ func _ready():
 	# Prepare game state in the background
 	reset_game_state()
 	_initialize_audio()
+	_initialize_sfx_map() # Initialize the SFX dictionary
 
 	# Start the tutorial instead of the game
 	_start_tutorial()
 
 	# Ensure the glow layer is transparent at the start
 	background_glow.modulate.a = 0.0
+
+
+# --- SFX INITIALIZATION ---
+func _initialize_sfx_map():
+	sfx_map = {
+		"Perfect": {
+			1: sfx_perfect_hit,    # Track 1: Hit
+			2: sfx_perfect_furnace, # Track 2: Furnace
+			3: sfx_perfect_blow     # Track 3: Blow
+		},
+		"Imperfect": {
+			1: sfx_imperfect_hit,
+			2: sfx_imperfect_furnace,
+			3: sfx_imperfect_blow
+		}
+	}
 
 
 # --- TUTORIAL LOGIC ---
@@ -612,20 +636,17 @@ func _process_judgment(judgment: String, note: Node, miss_track_id: int = -1):
 		"Perfect":
 			notes_hit_in_current_loop += 1
 			consecutive_perfects += 1
-
-			# Use different fever gain based on whether it's an empowered perfect
 			var fever_gain = fever_gain_empowered_perfect if is_empowered_perfect else fever_gain_perfect
 			set_fever_meter(fever_meter + fever_gain, true)
-
 			consecutive_misses = 0
-			sfx_perfect.play()
+			_play_sfx("Perfect", track_id)
 			if is_awaiting_level_sync_hit: _sync_music_on_hit()
 		"Good", "OK":
 			notes_hit_in_current_loop += 1
 			consecutive_perfects = 0
 			set_fever_meter(fever_meter - fever_penalty_imperfect, false)
 			consecutive_misses = 0
-			sfx_imperfect.play()
+			_play_sfx("Imperfect", track_id)
 			if is_awaiting_level_sync_hit: _sync_music_on_hit()
 		"Miss":
 			consecutive_perfects = 0
@@ -644,6 +665,13 @@ func _process_judgment(judgment: String, note: Node, miss_track_id: int = -1):
 	_update_progression()
 	_update_fever_state()
 	_update_ui()
+
+
+func _play_sfx(judgment_type: String, track_id: int):
+	if sfx_map.has(judgment_type) and sfx_map[judgment_type].has(track_id):
+		var sfx_player = sfx_map[judgment_type][track_id]
+		if is_instance_valid(sfx_player):
+			sfx_player.play()
 
 
 func _sync_music_on_hit():
