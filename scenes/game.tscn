@@ -878,12 +878,14 @@ stream = ExtResource("25_u80yv")
 
 [node name="SfxImperfectFurnace" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource("26_cwnf7")
+volume_db = 8.0
 
 [node name="SfxPerfectBlow" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource("27_c7nsv")
 
 [node name="SfxImperfectBlow" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource("28_k6l4n")
+volume_db = 5.0
 
 [node name="SfxLevelUp" type="AudioStreamPlayer" parent="SFX"]
 stream = ExtResource("13_gpl5b")
