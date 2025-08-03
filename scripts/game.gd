@@ -15,6 +15,13 @@ const VOLUME_MUTED_DB: float = -80.0
 const LOOP_DURATION: float = 24.0
 const EVALUATION_TIME: float = 21.0
 
+# --- Background Animation ---
+const ANIMATION_MAP = {
+	1: "hit",    # Track 1
+	2: "furnace", # Track 2
+	3: "blow"    # Track 3
+}
+
 # --- Scoring & Empowered Notes Parameters ---
 const SCORE_VALUES = { "Perfect": 1000, "Good": 250, "OK": 50, "Miss": 0 }
 const EMPOWERED_BONUS: int = 1500
@@ -117,6 +124,7 @@ var _settings_bar_inactive: LabelSettings
 var is_supernova_active: bool = false
 var supernova_tween: Tween
 var fever_bar_tween: Tween
+var is_background_animating: bool = false
 
 # Screen Shake State
 var shake_strength: float = 0.0
@@ -133,6 +141,8 @@ var rng = RandomNumberGenerator.new()
 @onready var transition_feedback_timer: Timer = $TransitionFeedbackTimer
 @onready var tier_name_label: Label = $UI/TierDisplay/TierNameLabel
 @onready var level_bars: Array[Label] = [$UI/TierDisplay/LevelBarsContainer/LevelBar1, $UI/TierDisplay/LevelBarsContainer/LevelBar2, $UI/TierDisplay/LevelBarsContainer/LevelBar3]
+@onready var background: AnimatedSprite2D = $Background
+@onready var background_glow: AnimatedSprite2D = $BackgroundGlow
 
 @onready var music_layers: Dictionary = {0: $MusicLayers/MusicLayer1, 1: $MusicLayers/MusicLayer2, 2: $MusicLayers/MusicLayer3}
 @onready var sfx_perfect: AudioStreamPlayer = $SFX/SfxPerfect
@@ -162,6 +172,8 @@ func _ready():
 	_capture_ui_styles()
 	reset_game_state()
 	_initialize_audio()
+	# Ensure the glow layer is transparent at the start
+	background_glow.modulate.a = 0.0
 
 
 func _capture_ui_styles():
@@ -408,6 +420,9 @@ func _process_judgment(judgment: String, note: Node, miss_track_id: int = -1):
 	var position = note.global_position if note else Vector2(target_pos_marker.global_position.x, track_y_positions[track_id - 1])
 	var is_empowered = note.is_empowered if note else false
 
+	if judgment != "Miss" and track_id > 0:
+		_play_background_animation(track_id)
+
 	var score_change = 0
 	var is_empowered_perfect = (judgment == "Perfect" and is_empowered)
 	if is_empowered_perfect:
@@ -495,17 +510,13 @@ func _trigger_score_popup(judgment: String, pos: Vector2, score: int, is_empower
 func _trigger_camera_shake(judgment: String, is_empowered_perfect: bool):
 	if judgment != "Perfect": return
 
-	# Calcule la force du shake pour un "perfect" en fonction du combo consécutif.
-	# Le combo commence à 1, donc (consecutive_perfects - 1) donne le nombre d'incréments.
 	var current_perfect_shake = shake_strength_perfect_base + ((consecutive_perfects - 1) * shake_strength_perfect_increment)
 	current_perfect_shake = min(current_perfect_shake, shake_strength_perfect_max)
 
-	# Les "empowered perfects" ont une force doublée par rapport à la valeur actuelle du shake.
 	var strength = current_perfect_shake
 	if is_empowered_perfect:
 		strength *= 2.0
 
-	# Applique la force du shake. Utiliser max() évite qu'un shake plus fort soit écrasé par un plus faible.
 	shake_strength = max(shake_strength, strength)
 
 func _trigger_target_flash(judgment: String, track_id: int):
@@ -531,6 +542,45 @@ func _trigger_hit_particles(judgment: String, pos: Vector2, is_empowered_perfect
 		emitter.global_position = pos
 		emitter.restart()
 
+func _play_background_animation(track_id: int):
+	if is_background_animating or not ANIMATION_MAP.has(track_id):
+		return
+
+	is_background_animating = true
+
+	var base_anim = ANIMATION_MAP[track_id]
+	var glow_anim = base_anim + "_glow"
+	var unglow_anim = base_anim + "_unglow"
+
+	# Step 1: Play the initial part of the animation.
+	background.play(base_anim)
+	await background.animation_finished
+
+	# Step 2: Prepare layers for the cross-fade.
+	# Bottom layer gets the final "normal" frame.
+	background.play(unglow_anim)
+	# Top layer gets the "glow" frame and is made visible.
+	background_glow.play(glow_anim)
+	background_glow.modulate.a = 1.0
+
+	# Step 3: Wait for the glow duration.
+	await get_tree().create_timer(0.25).timeout
+
+	# Step 4: Fade out the top glow layer, revealing the normal layer underneath.
+	var tween = create_tween()
+	tween.tween_property(background_glow, "modulate:a", 0.0, 0.3)
+	await tween.finished
+
+	# Step 5 (was the bug): The line `await background.animation_finished` is removed.
+	# It was causing the function to hang because the signal was missed.
+	# We can now immediately return to idle.
+
+	# Step 6: Return the main background to the default idle state.
+	background.play("idle")
+
+	# Release the lock so another animation can play.
+	is_background_animating = false
+
 
 # --- Screen Shake Logic ---
 func _process_shake(delta: float) -> void:
@@ -555,18 +605,11 @@ func set_fever_meter(value: float, use_tween: bool):
 	fever_meter = clamp(value, FEVER_METER_MIN, FEVER_METER_MAX)
 
 	if use_tween:
-		# Kill any previous animation to avoid conflicts
-		if fever_bar_tween and fever_bar_tween.is_valid():
-			fever_bar_tween.kill()
-
-		# Create a new tween and store its reference
+		if fever_bar_tween and fever_bar_tween.is_valid(): fever_bar_tween.kill()
 		fever_bar_tween = create_tween()
 		fever_bar_tween.tween_property(fever_meter_bar, "value", fever_meter, 0.15).set_ease(Tween.EASE_OUT)
 	else:
-		# For decay, we don't directly set the bar value; we let the lerp handle it.
-		# But if a tween was running, we kill it so the lerp can take over.
-		if fever_bar_tween and fever_bar_tween.is_valid():
-			fever_bar_tween.kill()
+		if fever_bar_tween and fever_bar_tween.is_valid(): fever_bar_tween.kill()
 
 func _update_fever_state():
 	var old_multiplier = score_multiplier
@@ -588,8 +631,6 @@ func _update_fever_state():
 
 func _update_fever_bar_color():
 	var target_color = FEVER_BAR_COLORS.get(score_multiplier, Color.GRAY)
-
-	# Create a smooth color transition
 	var color_tween = create_tween()
 	color_tween.tween_method(_set_fever_bar_color, fever_meter_bar.modulate, target_color, 0.3)
 	color_tween.set_ease(Tween.EASE_OUT)
@@ -605,24 +646,17 @@ func _update_multiplier_tier_visuals():
 
 	for tier_value in multiplier_tier_labels:
 		var label: Label = multiplier_tier_labels[tier_value]
-
-		# First, remove modulation so our color overrides work as expected.
 		label.modulate = Color.WHITE
-		# Then, apply the theme overrides for color and outline.
 		label.add_theme_color_override("outline_color", outline_color)
-
 		if score_multiplier == tier_value:
-			# Current active tier: White, large font, thick outline
 			label.add_theme_color_override("font_color", active_color)
 			label.add_theme_font_size_override("font_size", 28)
 			label.add_theme_constant_override("outline_size", 6)
 		elif score_multiplier > tier_value:
-			# Surpassed tiers: Light gray, regular font, medium outline
 			label.add_theme_color_override("font_color", surpassed_color)
 			label.add_theme_font_size_override("font_size", 20)
 			label.add_theme_constant_override("outline_size", 4)
 		else:
-			# Inactive/unreached tiers: Dark gray, regular font, subtle outline
 			label.add_theme_color_override("font_color", inactive_color)
 			label.add_theme_font_size_override("font_size", 20)
 			label.add_theme_constant_override("outline_size", 4)
@@ -634,7 +668,6 @@ func _activate_supernova(activate: bool):
 		supernova_flame.play("default")
 		if supernova_tween and supernova_tween.is_valid(): supernova_tween.kill()
 		supernova_tween = create_tween().set_loops()
-		# Use the current multiplier color as base for pulsing
 		var base_color = FEVER_BAR_COLORS.get(score_multiplier, Color.ORCHID)
 		var pulse_color = base_color.lightened(0.3)
 		supernova_tween.tween_property(fever_meter_bar, "modulate", pulse_color, 0.5).set_trans(Tween.TRANS_SINE)
@@ -642,14 +675,13 @@ func _activate_supernova(activate: bool):
 	else:
 		supernova_flame.stop()
 		if supernova_tween and supernova_tween.is_valid(): supernova_tween.kill()
-		# Return to the current multiplier color instead of white
 		var current_color = FEVER_BAR_COLORS.get(score_multiplier, Color.GRAY)
 		fever_meter_bar.modulate = current_color
 
 func calculate_miss_penalty() -> int:
 	if consecutive_misses == 0: return base_miss_penalty
 	var penalty = base_miss_penalty * (2 ** (consecutive_misses - 1))
-	return min(penalty, 32000)  # Cap the penalty at 32000
+	return min(penalty, 32000)
 
 func _update_progression():
 	var potential_tier_idx = 0; var potential_level_idx = 0; var found_level = false

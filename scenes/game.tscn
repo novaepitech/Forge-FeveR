@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3 uid="uid://b3pm2nt526yr7"]
+[gd_scene load_steps=53 format=3 uid="uid://b3pm2nt526yr7"]
 
 [ext_resource type="Script" uid="uid://bh6srqu5h8vbj" path="res://scripts/game.gd" id="1_uwrxv"]
 [ext_resource type="PackedScene" uid="uid://c5q0aax10g47x" path="res://scenes/hit_feedback_popup.tscn" id="2_2o43q"]
@@ -10,12 +10,164 @@
 [ext_resource type="AudioStream" uid="uid://di1w5iy6cbu8o" path="res://assets/musics/base.mp3" id="8_1n0f8"]
 [ext_resource type="Shader" uid="uid://dpiypedu682bu" path="res://shaders/glow.gdshader" id="8_ca42v"]
 [ext_resource type="Texture2D" uid="uid://umook1nc0r3r" path="res://assets/sprites/FireBall/Sheets/IdleLoop-Sheet.png" id="8_ir15t"]
+[ext_resource type="Texture2D" uid="uid://op2x2wg67pe3" path="res://assets/sprites/background_spritesheet.png" id="8_rysoc"]
 [ext_resource type="AudioStream" uid="uid://cbjex6cmtwjjt" path="res://assets/musics/level_1.mp3" id="9_v36j1"]
 [ext_resource type="AudioStream" uid="uid://cnw7vabx6gcb2" path="res://assets/sounds/perfect.mp3" id="10_w0n6e"]
 [ext_resource type="AudioStream" uid="uid://bqw1wfhtkablf" path="res://assets/sounds/imperfect.mp3" id="11_h2o8l"]
 [ext_resource type="AudioStream" uid="uid://crkw3aqfafr2a" path="res://assets/sounds/miss.mp3" id="12_c1042"]
 [ext_resource type="AudioStream" uid="uid://cn6mp6onl0vc7" path="res://assets/sounds/level_up.mp3" id="13_gpl5b"]
 [ext_resource type="AudioStream" uid="uid://buiwqcrj4oo2g" path="res://assets/sounds/level_down.mp3" id="14_82vma"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y0upk"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(7680, 4320, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jougr"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(0, 6480, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cbsqf"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(3840, 6480, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wisxt"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(7680, 6480, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wax1t"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(0, 2160, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1tmhi"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(7680, 2160, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l5f8m"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(0, 4320, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6vm3t"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(3840, 4320, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8efq7"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(0, 0, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_da6cc"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(3840, 0, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b6e46"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(7680, 0, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_td6w2"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(0, 2160, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r2thq"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(0, 2160, 3840, 2160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0470j"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(3840, 2160, 3840, 2160)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ssvqc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y0upk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jougr")
+}],
+"loop": false,
+"name": &"blow",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cbsqf")
+}],
+"loop": false,
+"name": &"blow_glow",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wisxt")
+}],
+"loop": false,
+"name": &"blow_unglow",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wax1t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1tmhi")
+}],
+"loop": false,
+"name": &"furnace",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l5f8m")
+}],
+"loop": false,
+"name": &"furnace_glow",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6vm3t")
+}],
+"loop": false,
+"name": &"furnace_unglow",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8efq7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_da6cc")
+}],
+"loop": false,
+"name": &"hit",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b6e46")
+}],
+"loop": false,
+"name": &"hit_glow",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_td6w2")
+}],
+"loop": false,
+"name": &"hit_unglow",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r2thq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0470j")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 0.67
+}]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ssvqc"]
 shader = ExtResource("8_ca42v")
@@ -163,6 +315,22 @@ glow_blend_mode = 1
 script = ExtResource("1_uwrxv")
 HitFeedbackPopup = ExtResource("2_2o43q")
 sword_state_textures = Array[Texture2D]([ExtResource("3_g70v4"), ExtResource("4_5s14w"), ExtResource("5_a0n7o"), ExtResource("6_53tq7"), ExtResource("7_v8h6g")])
+
+[node name="Background" type="AnimatedSprite2D" parent="."]
+z_index = -2
+position = Vector2(576, 324)
+scale = Vector2(0.3, 0.3)
+sprite_frames = SubResource("SpriteFrames_ssvqc")
+animation = &"blow_glow"
+autoplay = "idle"
+
+[node name="BackgroundGlow" type="AnimatedSprite2D" parent="."]
+z_index = -2
+position = Vector2(576, 324)
+scale = Vector2(0.3, 0.3)
+sprite_frames = SubResource("SpriteFrames_ssvqc")
+animation = &"blow_glow"
+autoplay = "idle"
 
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
@@ -320,6 +488,7 @@ vertical_alignment = 1
 [node name="PopupContainer" type="Node2D" parent="UI"]
 
 [node name="LoopTimeLabel" type="Label" parent="UI"]
+visible = false
 anchors_preset = -1
 anchor_top = 1.0
 anchor_bottom = 1.0
