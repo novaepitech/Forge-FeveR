@@ -571,9 +571,10 @@ func _play_background_animation(track_id: int):
 	tween.tween_property(background_glow, "modulate:a", 0.0, 0.3)
 	await tween.finished
 
-	# Step 5 (was the bug): The line `await background.animation_finished` is removed.
-	# It was causing the function to hang because the signal was missed.
-	# We can now immediately return to idle.
+	# Step 5: For furnace/blow, play the base animation in reverse for a nice cooldown effect.
+	if base_anim == "furnace" or base_anim == "blow":
+		background.play_backwards(base_anim)
+		await background.animation_finished
 
 	# Step 6: Return the main background to the default idle state.
 	background.play("idle")
